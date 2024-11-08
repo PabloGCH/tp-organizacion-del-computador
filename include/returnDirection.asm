@@ -9,27 +9,27 @@ section .text
     global returnDirection
 
     returnDirection:
-        ; (rdi;rsi) = (x₀,y₀)
-        ; (rdx;rcx) = (x₁,y₁)
+        ; (dil;sil) = (x₀,y₀)
+        ; (dh;dl) = (x₁,y₁)
 
-        mov [origin]  , rdi 
-        mov [origin+1], rsi
+        mov byte[origin]  , dil 
+        mov byte[origin+1], sil
 
-        sub [origin], rdx ; x₀ - x₁
-        sub [origin+1], rcx ; y₀ - y₁
+        sub byte[origin], dh ; x₀ - x₁
+        sub byte[origin+1], dl ; y₀ - y₁
 
-        cmp [origin],0
+        cmp byte[origin],0
         je xAxisZero
-        jg xAxisPositive
-        jl xAxisNegative
+        jl xAxisPositive
+        jg xAxisNegative
 
     ; Las etiquetas de movimiento usan horarios del reloj
     xAxisZero:
 
-        cmp [origin+1],0
+        cmp byte[origin+1],0
         je movementNull
-        jg movementUp
-        jl movementDown
+        jl movementUp
+        jg movementDown
     
         movementUp:
             mov rax,1
@@ -43,10 +43,10 @@ section .text
     
     xAxisPositive:
 
-        cmp [origin+1],0
+        cmp byte[origin+1],0
         je movementRight
-        jg movementUpRight
-        jl movementDownRight
+        jl movementUpRight
+        jg movementDownRight
 
         movementRight:    
             mov rax, 3
@@ -60,10 +60,10 @@ section .text
 
     xAxisNegative:
 
-        cmp [origin+1, 0]
+        cmp byte[origin+1], 0
         je movementLeft
-        jg movementUpLeft
-        jl movementDownLeft
+        jl movementUpLeft
+        jg movementDownLeft
 
         movementLeft:
             mov rax, 7
@@ -76,4 +76,4 @@ section .text
             jmp end
     
     end:
-        return
+        ret

@@ -1,13 +1,22 @@
 
 global main
 %include "macros.asm"
-
+%include "returnDirection.asm"
 
 section .data
-  msg db "Hello, World!", 10, 0
+  msg db "The direction is: %li.", 10, 0
+
+section .bss
+  printNum resb 1
 
 section .text
 main:
-    print msg
-    ret
-    
+    mov dil, 1
+    mov sil, 1
+
+    mov dh, 2
+    mov dl, 1
+
+    call returnDirection
+    mov byte[printNum], al
+    printArg msg, printNum
