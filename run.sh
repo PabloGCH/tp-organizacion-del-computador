@@ -3,7 +3,7 @@
 nasm \
 -i include/ \
 -i macros/  \
-include/printStatistics.asm -f elf64 -o output/main.o -g
+main.asm -f elf64 -o output/main.o -g
 
 gcc output/main.o -o output/main.out -no-pie
 chmod +x output/main.out

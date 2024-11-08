@@ -1,8 +1,6 @@
-global main
-%include "../macros/macros.asm"
 
 section .data
-    stMovements db "Direcciones", 10, 10, 0
+    stMovements db "Direcciones", 10, 0
     movements db '7', '0', '1', '6', ' ', '2', '5', '4', '3', '3', 0
     mBoxLine db "+---+---+---+", 10, 0
     mBoxFormat db "| %c | %c | %c |", 10, 0
@@ -13,32 +11,38 @@ section .data
     mBoxOfficersTitle db "|           | Oficial 1 | Oficial 2 |", 10, 0
     mBoxOfficersFormat db "| DIR - %-3d | %-9hhi | %-9hhi |", 10, 0
     mBoxOfficersKillsFormat db "| CAPTURAS  | %-9hhi | %-9hhi |", 10, 0
+    newLine db 10, 0
 
-    officerOne db 5,2,5,6,72,1,2,2,8
-    officerTwo db 0,1,2,3,4,5,6,7,8
-    saltoLinea db 10, 0
 section .bss
-    ;officerOne resb 9
-    ;officerTwo resb 9
-    officerAux resb 9
+    officerOne resb 9
+    officerTwo resb 9
 section .text
-main:
-    ;mov [officerOne], rdi
-    ;mov [officerTwo], rsi
+    global printStats
 
-    sub rsp, 8
+printStats:
+    ;Guarda los valores de los oficiales
+    mov rax, [rdi]
+    mov [officerOne], rax
+    mov al, [rdi+8]
+    mov [officerOne+8], al
+
+    mov rax, [rsi]
+    mov [officerTwo], rax
+    mov al, [rsi+8]
+    mov [officerTwo+8], al
+    ;Fin de guardar los valores de los oficiales
+
     call printMovementsBox
-    add rsp, 8
 
-    sub rsp, 8
     call printOfficerStats
-    add rsp, 8
 
     ret
 
 printMovementsBox:
-    print saltoLinea
+    print newLine
     print stMovements
+    print newLine
+
 printMovementsBoxLoop:
     mov bl, [mCounter]
     cmp bl, 0
@@ -61,18 +65,20 @@ printMovementsBoxLoop:
 
     dec byte [mCounter]
     jmp printMovementsBoxLoop
+
 finBoxLoop:
     print mBoxLine
     ret
 
 printOfficerStats:
-    print saltoLinea
+    print newLine
     print stTitle
-    print saltoLinea
+    print newLine
     print mBoxOfficersLine
     print mBoxOfficersTitle
     print mBoxOfficersLine
     mov byte [mCounter], 0
+
 loopOfficerMovements:
     mov rbx, 0
     mov bl, [mCounter]
