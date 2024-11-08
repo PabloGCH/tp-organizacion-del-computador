@@ -101,9 +101,8 @@ finOfficerMovementsLoop:
     mov bl, [mCounter]
     cmp bl, 8
     mov rdi, mBoxOfficersKillsFormat
-    mov rsi, rbx
-    mov rdx, [officerOne + rbx]
-    mov rcx, [officerTwo + rbx]
+    mov rsi, [officerOne + rbx]
+    mov rdx, [officerTwo + rbx]
     sub rsp, 8
     call printf
     add rsp, 8
