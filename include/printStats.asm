@@ -1,7 +1,7 @@
 
 section .data
     stMovements db "Direcciones", 10, 0
-    movements db '7', '0', '1', '6', ' ', '2', '5', '4', '3', '3', 0
+    movements db '8', '1', '2', '7', ' ', '3', '6', '5', '4'
     mBoxLine db "+---+---+---+", 10, 0
     mBoxFormat db "| %c | %c | %c |", 10, 0
     mBoxOffset dq 0
@@ -82,7 +82,9 @@ loopOfficerMovements:
     jge finOfficerMovementsLoop
 
     mov rdi, mBoxOfficersFormat
+    inc rbx
     mov rsi, rbx
+    dec rbx
     mov rdx, [movementsOOne + rbx]
     mov rcx, [movementsOTwo + rbx]
     sub rsp, 8
