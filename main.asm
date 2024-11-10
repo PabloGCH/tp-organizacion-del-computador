@@ -10,7 +10,10 @@ section .data
 
 section .text
 main:
-    lea rdi, [t1]
-    lea rsi, [t2]
+    mov rdi, [t1]
+    mov sil, [t1+8]
+
+    mov rdx, [t2]
+    mov cl, [t2+8]
     call printStats
     ret

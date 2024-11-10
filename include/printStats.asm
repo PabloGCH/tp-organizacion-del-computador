@@ -14,23 +14,19 @@ section .data
     newLine db 10, 0
 
 section .bss
-    officerOne resb 9
-    officerTwo resb 9
+    movementsOOne resb 8
+    capturesOOne resb 1
+    movementsOTwo resb 8
+    capturesOTwo resb 1
 section .text
     global printStats
 
 printStats:
-    ;Guarda los valores de los oficiales
-    mov rax, [rdi]
-    mov [officerOne], rax
-    mov al, [rdi+8]
-    mov [officerOne+8], al
+    mov [movementsOOne], rdi
+    mov [capturesOOne], sil
 
-    mov rax, [rsi]
-    mov [officerTwo], rax
-    mov al, [rsi+8]
-    mov [officerTwo+8], al
-    ;Fin de guardar los valores de los oficiales
+    mov [movementsOTwo], rdx
+    mov [capturesOTwo], cl
 
     call printMovementsBox
 
@@ -87,8 +83,8 @@ loopOfficerMovements:
 
     mov rdi, mBoxOfficersFormat
     mov rsi, rbx
-    mov rdx, [officerOne + rbx]
-    mov rcx, [officerTwo + rbx]
+    mov rdx, [movementsOOne + rbx]
+    mov rcx, [movementsOTwo + rbx]
     sub rsp, 8
     call printf
     add rsp, 8
@@ -97,12 +93,9 @@ loopOfficerMovements:
 
 finOfficerMovementsLoop:
     print mBoxOfficersLine
-    mov rbx, 0
-    mov bl, [mCounter]
-    cmp bl, 8
     mov rdi, mBoxOfficersKillsFormat
-    mov rsi, [officerOne + rbx]
-    mov rdx, [officerTwo + rbx]
+    mov rsi, [capturesOOne]
+    mov rdx, [capturesOTwo]
     sub rsp, 8
     call printf
     add rsp, 8
