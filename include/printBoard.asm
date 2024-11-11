@@ -1,5 +1,5 @@
 ;         +---+---+---+        
-;         | X | X | X |        
+;         |   |   |   |        
 ;         +---+---+---+        
 ;         |   |   |   |        
 ; +---+---+---+---+---+---+---+
@@ -9,9 +9,9 @@
 ; +---+---+---+---+---+---+---+
 ; |   |   |   |   |   |   |   |
 ; +---+---+---+---+---+---+---+
-;         |   |   | O |        
+;         |   |   |   |        
 ;         +---+---+---+        
-;         | O |   |   |        
+;         |   |   |   |        
 ;         +---+---+---+        
 
 extern printf
@@ -19,18 +19,18 @@ extern printf
 global main
 
 section .data
-    ; board db -1,-1,0,0,0,-1,-1, \
-    ;          -1,-1,0,0,0,-1,-1, \
-    ;            0,0,0,0,0,0,0, \
-    ;            0,0,0,1,0,0,0, \
-    ;            0,0,0,0,0,0,0, \
-    ;          -1,-1,0,0,0,-1,-1, \
-    ;          -1,-1,0,0,0,-1,-1
-    ; bRows db 7
-    ; bCols db 7
-    board db 0,0,0,0,0,0,0,0,0
-    bRows db 3
-    bCols db 3
+    board db -1,-1,1,0,0,-1,-1, \
+             -1,-1,0,1,0,-1,-1, \
+               0,0,0,0,1,1,1, \
+               0,1,0,1,0,1,1, \
+               0,0,0,0,1,0,0, \
+             -1,-1,0,1,0,-1,-1, \
+             -1,-1,1,0,0,-1,-1
+    bRows db 7
+    bCols db 7
+    ; board db 0,0, 1,0
+    ; bRows db 2
+    ; bCols db 2
     bCountRows db 0
     bCountCols db 0
 
@@ -53,6 +53,7 @@ section .bss
     bOffsetRows resb 1
     bTotalOffset resb 1
     vect resb 4
+    maxValue resb 1
 section .text
 
 main:
@@ -107,41 +108,43 @@ doneLoopCols:
     ret
 
 printCrossAndUp:
-    mov rcx, 4
-loopResetVect:
-    mov byte [vect+rcx], -1
-    loop loopResetVect
-
-    mov rcx, 0
+    resetVector vect
+    xor rcx, rcx
     mov bl, [bTotalOffset]
     mov al, [board + rbx]
     mov byte [vect+rcx], al
+    inc rcx
     mov al, [bCountRows]
     cmp al, 0
     jle skipUp
     mov bl, [bTotalOffset]
     sub bl, [bCols]
-    inc rcx
     mov al, [board + rbx]
     mov byte [vect+rcx], al
+
+; 0 1
+; 2 3
+
 skipUp:
+    inc rcx
+    mov bl, [bTotalOffset]
     mov al, [bCountCols]
     cmp al, 0
     jle skipPrevious
     dec rbx
-    inc rcx
     mov al, [board + rbx]
     mov byte [vect+rcx], al
 skipPrevious:
+    inc rcx
     mov al, [bCountRows]
     cmp al, 0
     jle skipPreviousUp
     mov al, [bCountCols]
     cmp al, 0
     jle skipPreviousUp
-    inc rcx
     mov bl, [bTotalOffset]
-    sub bl, 8
+    sub bl, [bCols]
+    dec bl
     mov al, [board + rbx]
     mov byte [vect+rcx], al
 skipPreviousUp:
@@ -150,8 +153,9 @@ skipPreviousUp:
     sub rsp, 8
     call getMaxOfVector
     add rsp, 8
+    mov [maxValue], al
 
-    mov rdi, rax
+    mov dil, [maxValue]
     sub rsp, 8
     call printCross
     add rsp, 8
@@ -161,19 +165,34 @@ skipPreviousUp:
     sub rsp, 8
     call getMaxOfVector
     add rsp, 8
+    mov [maxValue], al
 
-    mov rdi, rax
+    mov dil, [maxValue]
     sub rsp, 8
     call printUp
     add rsp, 8
 
+    mov al, [bCountCols]
+    inc al
+    cmp al, [bCols]
+    je printRightCross
+
     jmp continueLoop
 
+printRightCross:
+    mov dil, [maxValue]
+    sub rsp, 8
+    call printCross
+    add rsp, 8
+    jmp continueLoop
 printCross:
-    cmp rdi, 0
-    je printCrossNormal
-    jg printCrossEmpty
-    jl printCrossFortress
+    cmp dil, 0
+    jl printCrossEmpty
+    jz printCrossNormal
+
+    print cRed
+    print bCross
+    ret
 printCrossEmpty:
     print cReset
     print bCrossE
@@ -183,26 +202,20 @@ printCrossNormal:
     print bCross
     ret
 
-printCrossFortress:
-    print cRed
-    print bCross
-    ret
-
 printUp:
-    cmp rdi, 0
+    cmp dil, 0
     jl printUpEmpty
-    jg printUpFortress
-    je printUpNormal
+    jz printUpNormal
+
+    print cRed
+    print bUpDown
+    ret
 printUpEmpty:
     print cReset
     print bUpDownE
     ret
 printUpNormal:
     print cReset
-    print bUpDown
-    ret
-printUpFortress:
-    print cRed
     print bUpDown
     ret
 
@@ -230,8 +243,9 @@ skipPrevious2:
     sub rsp, 8
     call getMaxOfVector
     add rsp, 8
+    mov [maxValue], al
 
-    mov rdi, rax
+    mov dil, al
     sub rsp, 8
     call printLeft
     add rsp, 8
@@ -241,38 +255,65 @@ skipPrevious2:
     sub rsp, 8
     call getMaxOfVector
     add rsp, 8
+    mov [maxValue], al
 
-    mov rdi, rax
+    mov dil, al
     sub rsp, 8
     call printData
     add rsp, 8
 
+    mov al, [bCountCols]
+    inc al
+    cmp al, [bCols]
+    je printRightLine
     jmp continueLoop
 
+printRightLine:
+    mov dil, [maxValue]
+    sub rsp, 8
+    call printLeft
+    add rsp, 8
+
+    jmp continueLoop
+
+printDownCrossAndLine:
+    mov dil, [maxValue]
+    sub rsp, 8
+    call printCross
+    add rsp, 8
+
+    mov dil, [maxValue]
+    sub rsp, 8
+    call printUp
+    add rsp, 8
+
+    jmp continueLoop
 printLeft:
-    cmp rdi, 0
+    cmp dil, 0
     jl printLeftEmpty
-    jg printLeftFortress
-    je printLeftNormal
-printLeftEmpty:
-    print bLeftRightE
-    ret
-printLeftNormal:
-    print bLeftRight
-    ret
-printLeftFortress:
+    jz printLeftNormal
     print cRed
     print bLeftRight
     ret
-printData:
-    cmp rdi, 0
-    jg printDataEmpty
-    jle printDataFully
-printDataEmpty:
-    printArg bDataE, vect
+
+printLeftEmpty:
+    print cReset
+    print bLeftRightE
     ret
-printDataFully:
+printLeftNormal:
+    print cReset
+    print bLeftRight
+    ret
+
+printData:
+    cmp dil, 0
+    jl printDataEmpty
+    print cReset
     printArg bData, vect
+    ret
+printDataEmpty:
+    print cReset
+    printArg bDataE, vect
     ret
 
 getMaxOfVector:
