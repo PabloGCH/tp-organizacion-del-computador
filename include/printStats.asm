@@ -42,7 +42,7 @@ printMovementsBox:
 printMovementsBoxLoop:
     mov bl, [mCounter]
     cmp bl, 0
-    jle finBoxLoop
+    jle doneBoxLoop
 
     mov rbx, [mBoxOffset]
     print mBoxLine
@@ -62,7 +62,7 @@ printMovementsBoxLoop:
     dec byte [mCounter]
     jmp printMovementsBoxLoop
 
-finBoxLoop:
+doneBoxLoop:
     print mBoxLine
     ret
 
@@ -79,7 +79,7 @@ loopOfficerMovements:
     mov rbx, 0
     mov bl, [mCounter]
     cmp bl, 8
-    jge finOfficerMovementsLoop
+    jge doneOfficerMovementsLoop
 
     mov rdi, mBoxOfficersFormat
     inc rbx
@@ -93,7 +93,7 @@ loopOfficerMovements:
     inc byte [mCounter]
     jmp loopOfficerMovements
 
-finOfficerMovementsLoop:
+doneOfficerMovementsLoop:
     print mBoxOfficersLine
     mov rdi, mBoxOfficersKillsFormat
     mov rsi, [capturesOOne]
