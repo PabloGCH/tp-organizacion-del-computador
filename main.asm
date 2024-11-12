@@ -1,13 +1,13 @@
 
 global main
 %include "macros.asm"
-%include "receiveUserPositionInputs.asm"
+%include "getUserPositionInput.asm"
 
 
 section .text
 main:
     sub     rsp,    8
-    call    receiveUserPositionInputs
+    call    getUserPositionInput
     add     rsp,    8
     ret
     
