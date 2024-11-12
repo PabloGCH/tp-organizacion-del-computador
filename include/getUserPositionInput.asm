@@ -1,5 +1,6 @@
 global getUserPositionInput
 extern gets
+%include "validateInput.asm"
 
 
 
@@ -16,18 +17,20 @@ section .data
 
 
 section .bss
-  inputText                    resb       60
-  positions      times 4       resw       0   ; pieceRow, pieceColumn, destinationRow, destinationColumn
+  inputText                    resb       100
+  position       times 2       resw       1   ; row, column
+  positions      times 4       resw       1   ; pieceRow, pieceColumn, destinationRow, destinationColumn
 
 
 
 
-;PRE-COND: LA SUBRUTINA NO TIENE PARAMETROS DE ENTRADA
-;POST-COND: LA SUBRUTINA DEVUELVE UNA DIRECCION DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS
-;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO          
-;           EN ESE ORDEN. CADA ELEMENTO ES UN WORD (2 BYTES)
-;PROBAR CON COMANDO "p/d *((short *) $rax)@4" desde gdb
 section .text
+  ;PRE-COND:  LA SUBRUTINA NO TIENE PARAMETROS DE ENTRADA
+  ;POST-COND: LA SUBRUTINA DEVUELVE UNA DIRECCION DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS
+  ;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO          
+  ;           EN ESE ORDEN. CADA ELEMENTO ES UN WORD (2 BYTES)
+  ;TESTEAR:   PROBAR CON EL COMANDO "p/d *((short *) $rax)@4" DESDE GDB ANTES DE QUE TERMINE EL PROGRAMA
+  ;           DEBERIA MOSTRAR LOS VALORES INGRESADOS POR EL USUARIO
   getUserPositionInput:
     
     getPiecePosition:
@@ -49,7 +52,23 @@ section .text
       sub     rsp,    8
       call    sscanf
       add     rsp,    8
-      ; Si no es valido deberia de repetir "receivePiecePosition"
+
+      ; SI EL INPUT NO ES VALIDO, SE REPITE LA SOLICITUD
+      validatePiecePosition:
+        mov     ax,  word[pieceRow]
+        mov     word[position],         ax
+        mov     ax,  word[pieceColumn]
+        mov     word[position + 2],     ax
+
+        mov     rdi,    position
+
+        sub     rsp,    8
+        call    validateInput
+        add     rsp,    8
+
+        cmp     rax,    0
+        je      getPiecePosition
+
     getDestination:
       print msgDestination
 
@@ -68,8 +87,25 @@ section .text
       sub     rsp,    8
       call    sscanf
       add     rsp,    8
-      ; Si no es valido deberia de repetir "receiveDestination"
-    saveResults:
+
+
+      ; SI EL INPUT NO ES VALIDO, SE REPITE LA SOLICITUD
+      validateDestinationPosition:
+        mov     ax,  word[destinationRow]
+        mov     word[position],         ax
+        mov     ax,  word[destinationColumn]
+        mov     word[position + 2],     ax
+
+        mov     rdi,    position
+
+        sub     rsp,    8
+        call    validateInput
+        add     rsp,    8
+
+        cmp     rax,    0
+        je      getDestination
+
+    saveInputResults:
       mov     ax,    word[pieceRow]
       mov     word[positions],        ax
       mov     ax,    word[pieceColumn]
