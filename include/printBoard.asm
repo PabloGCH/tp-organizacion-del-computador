@@ -19,18 +19,18 @@ extern printf
 global main
 
 section .data
-    board db -1,-1,1,0,0,-1,-1, \
-             -1,-1,0,1,0,-1,-1, \
-               0,0,0,0,1,1,1, \
-               0,1,0,1,0,1,1, \
-               0,0,0,0,1,0,0, \
-             -1,-1,0,1,0,-1,-1, \
-             -1,-1,1,0,0,-1,-1
+    board db -1,-1,1,1,1,-1,-1, \
+             -1,-1,1,1,1,-1,-1, \
+               0,0,1,1,1,0,0, \
+               0,0,0,0,0,0,0, \
+               0,0,0,0,0,0,0, \
+             -1,-1,0,0,0,-1,-1, \
+             -1,-1,0,0,0,-1,-1
     bRows db 7
     bCols db 7
-    ; board db 0,0, 1,0
-    ; bRows db 2
-    ; bCols db 2
+    ; board db 0
+    ; bRows db 1
+    ; bCols db 1
     bCountRows db 0
     bCountCols db 0
 
@@ -78,12 +78,23 @@ loopRows:
     je skipIncrementRows
     inc byte [bCountRows]
 
+    mov al, [bCountRows]
+    cmp al, [bRows]
+    jge printDownCrossAndLine
+
 skipIncrementRows:
     not byte [repeatFlag]
     jmp loopRows
 
 doneLoopRows:
     ret
+
+printDownCrossAndLine:
+    not byte [repeatFlag]
+    sub rsp, 8
+    call loopCols
+    add rsp, 8
+    jmp loopRows
 
 loopCols:
     xor rax, rax
@@ -276,18 +287,6 @@ printRightLine:
 
     jmp continueLoop
 
-printDownCrossAndLine:
-    mov dil, [maxValue]
-    sub rsp, 8
-    call printCross
-    add rsp, 8
-
-    mov dil, [maxValue]
-    sub rsp, 8
-    call printUp
-    add rsp, 8
-
-    jmp continueLoop
 printLeft:
     cmp dil, 0
     jl printLeftEmpty
