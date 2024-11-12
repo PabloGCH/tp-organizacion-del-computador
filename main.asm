@@ -1,13 +1,13 @@
 
 global main
 %include "macros.asm"
+%include "receiveUserPositionInputs.asm"
 
-
-section .data
-  msg db "Hello, World!", 10, 0
 
 section .text
 main:
-    print msg
+    sub     rsp,    8
+    call    receiveUserPositionInputs
+    add     rsp,    8
     ret
     
