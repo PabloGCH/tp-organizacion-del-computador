@@ -1,4 +1,4 @@
-
+%include "macros.asm"
 section .data
     stMovements db "Direcciones", 10, 0
     movements db '8', '1', '2', '7', ' ', '3', '6', '5', '4'

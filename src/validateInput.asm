@@ -1,3 +1,4 @@
+%include "macros.asm"
 global validateInput
 
 section .data

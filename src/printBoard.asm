@@ -15,8 +15,8 @@
 ;         +---+---+---+        
 
 extern printf
-%include "../macros/macros.asm"
-global main
+%include "macros.asm"
+global printBoard
 
 section .data
     board db -1,-1,1,1,1,-1,-1, \
@@ -56,7 +56,7 @@ section .bss
     maxValue resb 1
 section .text
 
-main:
+printBoard:
 
 loopRows:
     xor rax, rax

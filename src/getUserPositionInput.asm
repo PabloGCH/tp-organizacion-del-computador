@@ -1,8 +1,7 @@
 global getUserPositionInput
 extern gets
-%include "validateInput.asm"
-
-
+extern validateInput
+%include "macros.asm"
 
 section .data
   msgPiecePosition             db     "Ingrese la fila y columna de la pieza (Separado por espacios): ", 0
