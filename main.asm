@@ -58,13 +58,35 @@ global main
 ;  print rax
 ;  jmp main
 
+; TEST DE RETURN DIRECTION
+;=================
+
+;%include "returnDirection.asm"
+;
+;section .data
+;  msg db "The direction is: %li.", 10, 0
+;
+;section .bss
+;  printNum resb 1
+;
+;main:
+;    mov dil, 1
+;    mov sil, 1
+;
+;    mov dh, 2
+;    mov dl, 1
+;
+;    call returnDirection
+;    mov byte[printNum], al
+;    printArg msg, printNum
+;  ret
+
 section .data
-  msg db "Hello, World!", 10, 0
+  msg db "Hola mundo", 10, 0
+
 
 section .text
-  print msg
-
-
-
+  main:
+    print msg
 
 
