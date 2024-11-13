@@ -33,6 +33,11 @@ section .text
   getUserPositionInput:
     
     getPiecePosition:
+      ; SE INICIALIZAN LA POSICION CON UN VALOR INVALIDO PARA QUE NO USE VALORES VIEJOS
+      ; EN FUTURAS INVOCACIONES DE LA SUBRUTINA
+      initPiecePosition:
+        mov     word[pieceRow],             0
+        mov     word[pieceColumn],          0
       print msgPiecePosition
 
       mov     rdi,    inputText
@@ -69,6 +74,11 @@ section .text
         je      getPiecePosition
 
     getDestination:
+      ; SE INICIALIZAN LA POSICION CON UN VALOR INVALIDO PARA QUE NO USE VALORES VIEJOS
+      ; EN FUTURAS INVOCACIONES DE LA SUBRUTINA
+      initDestinationPosition:
+        mov     word[destinationRow],       0
+        mov     word[destinationColumn],    0
       print msgDestination
 
       mov     rdi,    inputText
@@ -115,6 +125,7 @@ section .text
       mov     word[positions + 6],    ax
       mov     rax,    positions
     ret
+
     
 
 
