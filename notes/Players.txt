@@ -1,0 +1,4 @@
+Se identificaran a los jugadores con un numero
+
+0: Soldados
+1: Oficiales

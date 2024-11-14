@@ -1,6 +1,36 @@
 global main
 %include "macros.asm"
 
+;TEST VALIDACION DE POSICION EXISTENTE Y CELDA NO OCUPADA
+extern getUserPositionInput
+
+section .data
+  board db  -1, -1,  1,  1,  1, -1, -1, \
+            -1, -1,  1,  1,  1, -1, -1, \
+             1,  1,  1,  1,  1,  1,  1, \
+             1,  1,  1,  1,  1,  1,  1, \
+             1,  1,  0,  0,  0,  1,  1, \
+            -1, -1,  0,  0,  3, -1, -1, \
+            -1, -1,  2,  0,  0, -1, -1
+
+section .text
+  main:
+    mov rdi, board
+    mov rsi, 0
+
+    sub     rsp,    8
+    call getUserPositionInput
+    add     rsp,    8
+
+
+    mov rdi, board
+    mov rsi, 1
+
+    sub     rsp,    8
+    call getUserPositionInput
+    add     rsp,    8
+
+
 ;TEST DE PRINT STATS
 ;=================
 ;%include "printStats.asm"
@@ -81,12 +111,12 @@ global main
 ;    printArg msg, printNum
 ;  ret
 
-section .data
-  msg db "Hola mundo", 10, 0
-
-
-section .text
-  main:
-    print msg
+;section .data
+;  msg db "Hola mundo", 10, 0
+;
+;
+;section .text
+;  main:
+;    print msg
 
 
