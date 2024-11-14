@@ -70,13 +70,24 @@ section .text
       jle     invalidNoPiece    ; Si no hay una pieza lanza un error
 
     validatePieceOwnership:
-    mov     rax, 1
-    ret
+      cmp     dl,     0
+      je      playerIsSoldier
+
+      playerIsOfficer:
+        cmp   al,     2
+        jl    invalidNotYourPiece
+        jmp   piecePositionIsValid
+
+      playerIsSoldier:
+        cmp   al,     1
+        jne    invalidNotYourPiece
+        jmp   piecePositionIsValid
+
+    piecePositionIsValid:
+      mov     rax, 1
+      ret
     
     ; TODO: Crear metodo para verificar que la pieza ingresada tenga movimientos posibles (Varia segun soldado y oficial)
-
-
-
 
   validateDestinationInput:
     validateDestinationIsFree:
@@ -90,6 +101,11 @@ section .text
 
   invalidInput:
     print   invalidInputMsg
+    mov     rax,    0
+    ret
+
+  invalidNotYourPiece:
+    print   invalidNotYourPieceMsg
     mov     rax,    0
     ret
     
