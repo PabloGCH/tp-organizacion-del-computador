@@ -3,7 +3,7 @@ global printCurrentTurn
 %include "macros.asm"
 
 section .data
-    msg db "Turno de: %s", 10, 0
+    msg db "Turno de %s", 10, 0
     officer db "Oficial", 0
     soldier db "Soldado", 0
     newLine db 10, 0
