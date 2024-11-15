@@ -15,7 +15,7 @@ section .data
                         -1, -1,  2,  0,  0, -1, -1
 
   stronghold    db       2,  4,  4,  6
-  characters    db      'XO', 0
+  characters    db      'XO ', 0
 
 section .text
   main:
