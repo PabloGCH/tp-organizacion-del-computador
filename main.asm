@@ -3,21 +3,33 @@ global main
 
 ;TEST VALIDACION DE POSICION EXISTENTE Y CELDA NO OCUPADA
 extern getUserPositionInput
+extern printBoard
 
 section .data
-  board db  -1, -1,  1,  1,  1, -1, -1, \
-            -1, -1,  1,  1,  1, -1, -1, \
-             1,  1,  1,  1,  1,  1,  1, \
-             1,  1,  1,  1,  1,  1,  1, \
-             1,  1,  0,  0,  0,  1,  1, \
-            -1, -1,  0,  0,  3, -1, -1, \
-            -1, -1,  2,  0,  0, -1, -1
+  board         db      -1, -1,  1,  1,  1, -1, -1, \
+                        -1, -1,  1,  1,  1, -1, -1, \
+                         1,  1,  1,  1,  1,  1,  1, \
+                         1,  1,  1,  1,  1,  1,  1, \
+                         1,  1,  0,  0,  0,  1,  1, \
+                        -1, -1,  0,  0,  3, -1, -1, \
+                        -1, -1,  2,  0,  0, -1, -1
+
+  stronghold    db       2,  4,  4,  6
+  characters    db      'XO', 0
 
 section .text
   main:
     mov rdi, board
-    mov rsi, 0
+    mov esi, [stronghold]
+    mov edx, [characters] 
 
+    sub rsp, 8
+    call printBoard
+    add rsp, 8
+
+    mov rdi, board
+    mov rsi, 0
+    
     sub     rsp,    8
     call getUserPositionInput
     add     rsp,    8
@@ -47,6 +59,29 @@ section .text
 ;    mov rdx, [t2]
 ;    mov cl, [t2+8]
 ;    call printStats
+
+;TEST DE PRINT BOARD
+;=================
+; extern printBoard
+; section .data
+;   boardTest db  -1,  -1,   1,  1,  1,  -1,   -1, \
+;             -1,  -1,   1,  1,  1,  -1,   -1, \
+;              1,   1,   1,  1,  1,   1,    1, \
+;              1,   1,   1,  1,  1,   1,    1, \
+;              1,   1,   0,  0,  0,   1,    1, \
+;             -1,  -1,   0,  0,  3,  -1,   -1, \
+;             -1,  -1,   2,  0,  0,  -1,   -1,
+;   stronghold db 2,4,4,6
+;   characters db 'X0',0
+; section .text
+;   main:
+
+;     lea rdi, [boardTest]
+;     mov esi, [stronghold]
+;     mov edx, [characters]
+;     sub rsp, 8
+;     call printBoard
+;     add rsp, 8
 
 ;TEST DE GET INPUT
 ;=================
@@ -111,12 +146,5 @@ section .text
 ;    printArg msg, printNum
 ;  ret
 
-;section .data
-;  msg db "Hola mundo", 10, 0
-;
-;
-;section .text
-;  main:
-;    print msg
 
 

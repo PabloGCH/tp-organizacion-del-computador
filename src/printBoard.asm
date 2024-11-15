@@ -101,8 +101,8 @@ loopCols:
     mov [bTotalOffset], cl
 
     cmp byte [repeatFlag], 1
-    je printCrossAndUp
-    jne printLeftAndData
+    je processBoxLine
+    jne processBoxData
 continueLoop:
     inc byte [bCountCols]
     jmp loopCols
@@ -113,7 +113,7 @@ doneLoopCols:
     print newLine
     ret
 
-printCrossAndUp:
+processBoxLine:
     resetVector vect
     xor rbx, rbx
     xor rcx, rcx
@@ -124,36 +124,36 @@ printCrossAndUp:
     inc rcx
     mov al, [bCountRows]
     cmp al, 0
-    jle skipUp
+    jle skipBoxUp
     mov bl, [bTotalOffset]
     sub bl, [bCols]
     mov al, [r8 + rbx]
     mov byte [vect+rcx], al
 
-skipUp:
+skipBoxUp:
     inc rcx
     mov bl, [bTotalOffset]
     mov al, [bCountCols]
     cmp al, 0
-    jle skipPrevious
+    jle skipBoxPrevious
     dec rbx
     mov r8, [board]
     mov al, [r8 + rbx]
     mov byte [vect+rcx], al
-skipPrevious:
+skipBoxPrevious:
     inc rcx
     mov al, [bCountRows]
     cmp al, 0
-    jle skipPreviousUp
+    jle skipBoxPreviousUp
     mov al, [bCountCols]
     cmp al, 0
-    jle skipPreviousUp
+    jle skipBoxPreviousUp
     mov bl, [bTotalOffset]
     sub bl, [bCols]
     dec bl
     mov al, [r8 + rbx]
     mov byte [vect+rcx], al
-skipPreviousUp:
+skipBoxPreviousUp:
     lea rdi, [vect]
     mov rsi, 4
     sub rsp, 8
@@ -175,57 +175,78 @@ skipPreviousUp:
 
     mov dil, [maxValue]
     sub rsp, 8
-    call printUp
+    call printBoxLine
     add rsp, 8
 
     mov al, [bCountCols]
     inc al
     cmp al, [bCols]
-    je printRightCross
+    je printBoxCrossEnd
 
     jmp continueLoop
 
-printRightCross:
-    mov dil, [maxValue]
-    sub rsp, 8
-    call printCross
-    add rsp, 8
-    jmp continueLoop
 printCross:
     cmp dil, 0
     jl printCrossEmpty
-    jz printCrossNormal
+
+    print cReset
+    mov r8B, [bCountCols]
+    cmp r8B, [stronghold]
+    jl skipCrossRed
+    dec r8B
+    cmp r8B, [stronghold+1]
+    jg skipCrossRed
+
+    mov r8B, [bCountRows]
+    cmp r8B, [stronghold+2]
+    jl skipCrossRed
+    dec r8B
+    cmp r8B, [stronghold+3]
+    jg skipCrossRed
 
     print cRed
+skipCrossRed:
     print bCross
     ret
 printCrossEmpty:
     print cReset
     print bCrossE
     ret
-printCrossNormal:
-    print cReset
-    print bCross
-    ret
 
-printUp:
+printBoxLine:
     cmp dil, 0
-    jl printUpEmpty
-    jz printUpNormal
+    jl printLineEmpty
+    print cReset
+    mov r8B, [bCountCols]
+    cmp r8B, [stronghold]
+    jl skipLineRed
+    cmp r8B, [stronghold+1]
+    jg skipLineRed
+
+    mov r8B, [bCountRows]
+    cmp r8B, [stronghold+2]
+    jl skipLineRed
+    dec r8B
+    cmp r8B, [stronghold+3]
+    jg skipLineRed
 
     print cRed
+skipLineRed:
     print bUpDown
     ret
-printUpEmpty:
+printLineEmpty:
     print cReset
     print bUpDownE
     ret
-printUpNormal:
-    print cReset
-    print bUpDown
-    ret
 
-printLeftAndData:
+printBoxCrossEnd:
+    mov dil, [maxValue]
+    sub rsp, 8
+    call printCross
+    add rsp, 8
+    jmp continueLoop
+
+processBoxData:
     resetVector vect
     mov rcx, 0
     mov bl, [bTotalOffset]
@@ -235,12 +256,12 @@ printLeftAndData:
 
     mov al, [bCountCols]
     cmp al, 0
-    jle skipPrevious2
+    jle skipBoxDataPrevious
     dec rbx
     inc rcx
     mov al, [r8 + rbx]
     mov byte [vect+rcx], al
-skipPrevious2:
+skipBoxDataPrevious:
     lea rdi, [vect]
     mov rsi, 2
     sub rsp, 8
@@ -250,7 +271,7 @@ skipPrevious2:
 
     mov dil, al
     sub rsp, 8
-    call printLeft
+    call printBoxLeft
     add rsp, 8
 
     lea rdi, [vect]
@@ -268,32 +289,36 @@ skipPrevious2:
     mov al, [bCountCols]
     inc al
     cmp al, [bCols]
-    je printRightLine
+    je printBoxLineEnd
     jmp continueLoop
 
-printRightLine:
-    mov dil, [maxValue]
-    sub rsp, 8
-    call printLeft
-    add rsp, 8
-
-    jmp continueLoop
-
-printLeft:
+printBoxLeft:
     cmp dil, 0
     jl printLeftEmpty
-    jz printLeftNormal
+
+    print cReset
+
+    mov r8B, [bCountCols]
+    cmp r8B, [stronghold]
+    jl skipBoxLeftRed
+    dec r8B
+    cmp r8B, [stronghold+1]
+    jg skipBoxLeftRed
+
+    mov r8B, [bCountRows]
+    cmp r8B, [stronghold+2]
+    jl skipBoxLeftRed
+    cmp r8B, [stronghold+3]
+    jg skipBoxLeftRed
+
     print cRed
+skipBoxLeftRed:
     print bLeftRight
     ret
 
 printLeftEmpty:
     print cReset
     print bLeftRightE
-    ret
-printLeftNormal:
-    print cReset
-    print bLeftRight
     ret
 
 printData:
@@ -306,6 +331,14 @@ printDataEmpty:
     print cReset
     printArg bDataE, vect
     ret
+
+printBoxLineEnd:
+    mov dil, [maxValue]
+    sub rsp, 8
+    call printBoxLeft
+    add rsp, 8
+
+    jmp continueLoop
 
 getMaxOfVector:
     mov rcx, rsi
