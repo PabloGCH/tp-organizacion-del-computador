@@ -27,15 +27,16 @@ section .data
     bUpDown db "---", 0
     bLeftRight db "|", 0
     bCross db "+", 0
-    bData db " %-1hhi ", 0
+    bData db " %-1c ", 0
     bUpDownE db "   ", 0
     bLeftRightE db " ", 0
     bCrossE db " ", 0
     bDataE db "   ", 0
     newLine db 10,0
 
-    cRed db 27,"[31m",0
-    cGreen db 27,"[32m",0
+    cStronghold db 27,"[31m",0
+    cOfficerOne db 27,"[32m",0
+    cOfficerTwo db 27,"[34m",0
     cReset db 27,"[0m",0
 
     repeatFlag db 1
@@ -47,6 +48,7 @@ section .bss
     board resq 1
     stronghold times 4 resb 1
     characters times 4 resb 1
+    characterAux resb 1
 section .text
 
 printBoard:
@@ -204,7 +206,7 @@ printCross:
     cmp r8B, [stronghold+3]
     jg skipCrossRed
 
-    print cRed
+    print cStronghold
 skipCrossRed:
     print bCross
     ret
@@ -230,7 +232,7 @@ printBoxLine:
     cmp r8B, [stronghold+3]
     jg skipLineRed
 
-    print cRed
+    print cStronghold
 skipLineRed:
     print bUpDown
     ret
@@ -311,7 +313,7 @@ printBoxLeft:
     cmp r8B, [stronghold+3]
     jg skipBoxLeftRed
 
-    print cRed
+    print cStronghold
 skipBoxLeftRed:
     print bLeftRight
     ret
@@ -325,11 +327,17 @@ printData:
     cmp dil, 0
     jl printDataEmpty
     print cReset
-    printArg bData, vect
+
+    mov dil, [vect]
+    sub rsp, 8
+    call getCharacter
+    add rsp, 8
+    mov [characterAux], rax
+    printArg bData, characterAux
     ret
 printDataEmpty:
     print cReset
-    printArg bDataE, vect
+    print bDataE
     ret
 
 printBoxLineEnd:
@@ -339,6 +347,35 @@ printBoxLineEnd:
     add rsp, 8
 
     jmp continueLoop
+
+getCharacter:
+    xor rax, rax
+    cmp dil,0
+    je isEmpty
+    cmp dil, 1
+    je isSoldier
+    cmp dil, 2
+    je isOfficerOne
+    cmp dil, 3
+    je isOfficerTwo
+
+isSoldier:
+    mov al, [characters]
+    ret
+
+isOfficerOne:
+    print cOfficerOne
+    mov al, [characters + 1]
+    ret
+
+isOfficerTwo:
+    print cOfficerTwo
+    mov al, [characters + 1]
+    ret
+
+isEmpty:
+    mov al, [characters + 2]
+    ret
 
 getMaxOfVector:
     mov rcx, rsi
