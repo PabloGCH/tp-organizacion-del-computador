@@ -24,7 +24,7 @@ section .data
     bCountRows db 0
     bCountCols db 0
 
-    colsIndex db "         1   2   3   4   5   6   7    ", 10,10, 0
+    colsIndex db "         1   2   3   4   5   6   7  ", 10,10, 0
     rowsIndex db "   %-1hhi   ", 0
     rowsIndexE db "       ", 0
     bUpDown db "---", 0
