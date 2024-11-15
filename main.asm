@@ -18,6 +18,29 @@ global main
 ;    mov cl, [t2+8]
 ;    call printStats
 
+;TEST DE PRINT BOARD
+;=================
+; extern printBoard
+; section .data
+;   boardTest db  -1,  -1,   1,  1,  1,  -1,   -1, \
+;             -1,  -1,   1,  1,  1,  -1,   -1, \
+;              1,   1,   1,  1,  1,   1,    1, \
+;              1,   1,   1,  1,  1,   1,    1, \
+;              1,   1,   0,  0,  0,   1,    1, \
+;             -1,  -1,   0,  0,  3,  -1,   -1, \
+;             -1,  -1,   2,  0,  0,  -1,   -1,
+;   stronghold db 2,4,4,6
+;   characters db 'X0',0
+; section .text
+;   main:
+
+;     lea rdi, [boardTest]
+;     mov esi, [stronghold]
+;     mov edx, [characters]
+;     sub rsp, 8
+;     call printBoard
+;     add rsp, 8
+
 ;TEST DE GET INPUT
 ;=================
 ;%include "getUserPositionInput.asm"
@@ -83,7 +106,6 @@ global main
 
 section .data
   msg db "Hola mundo", 10, 0
-
 
 section .text
   main:
