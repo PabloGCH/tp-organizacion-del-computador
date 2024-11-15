@@ -25,13 +25,14 @@ section .text
   ; POST-COND: RETORNA 0 SI EL MOVIMIENTO NO ES POSIBLE
 
   movementIsPossible:
-    cmp     cl,    0
+    cmp     dl,    0
     je      validateSoldierMovementIsPossible
     
     validateOfficerMovementIsPossible:
       jmp     valid
       
     validateSoldierMovementIsPossible:
+      mov     byte[strongholdDir],    cl
       ; Validar que solo se este moviendo 1 posicion
   
       sub     rsp,    8
@@ -117,6 +118,7 @@ section .text
   validateGettingCloserToStronghold:
     xor     rax,    rax
     mov     word[distanceFromPieceToStronghold],    0
+    mov     word[distanceFromDestinationToStronghold],    0
 
     ; CALCULAR DISTANCIA ENTRE FILA DE PIEZA Y PUNTO DE REFERENCIA
     mov     ax,    word[rsi]
@@ -160,7 +162,7 @@ section .text
     
     mov     ax,    word[distanceFromPieceToStronghold]
     cmp     ax,    word[distanceFromDestinationToStronghold]
-    jge     notGettingCloserToStronghold
+    jle     notGettingCloserToStronghold
     mov     rax,    1
     ret
     
@@ -183,23 +185,23 @@ section .text
     ret
 
     strongholdIsUp:
-      mov     word[strongholdPointOfReference],    -1
-      mov     word[strongholdPointOfReference + 1],    3
+      mov     word[strongholdPointOfReference],    0
+      mov     word[strongholdPointOfReference + 2],    4
       ret
 
     strongholdIsRight:
-      mov     word[strongholdPointOfReference],    3
-      mov     word[strongholdPointOfReference + 1],    7
+      mov     word[strongholdPointOfReference],    4
+      mov     word[strongholdPointOfReference + 2],    8
       ret
       
     strongholdIsDown:
-      mov     word[strongholdPointOfReference],    7
-      mov     word[strongholdPointOfReference + 1],    3
+      mov     word[strongholdPointOfReference],    8
+      mov     word[strongholdPointOfReference + 2],    4
       ret
 
     strongholdIsLeft:
-      mov     word[strongholdPointOfReference],    3
-      mov     word[strongholdPointOfReference + 1],    -1
+      mov     word[strongholdPointOfReference],    4
+      mov     word[strongholdPointOfReference + 2],    0
       ret
 
 

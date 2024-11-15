@@ -34,7 +34,7 @@ section .text
   ;PRE-COND:  LA SUBRUTINA RECIBE
   ;           EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO
   ;           EN RSI UN NUMERO QUE INDICA TIPO DE JUGADOR           
-  ;           
+  ;           EN RDX LA DIRECCION DE LA FORTALEZA
               
   ;POST-COND: LA SUBRUTINA DEVUELVE UNA DIRECCION DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS
   ;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO          
@@ -44,6 +44,7 @@ section .text
   getUserPositionInput:
     mov    qword[board],    rdi
     mov    byte[playerType], sil
+    mov    byte[strongholdDir], dl
     
     
     getPiecePosition:
@@ -166,7 +167,7 @@ section .text
       mov     rdi,    board
       mov     rsi,    positions
       mov     rdx,    qword[playerType]
-      mov     cl,    byte[strongholdDir]
+      mov     cl,     byte[strongholdDir]
 
       sub     rsp,    8
       call    movementIsPossible
