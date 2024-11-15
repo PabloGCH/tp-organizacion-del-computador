@@ -145,7 +145,7 @@ section .text
         add     rsp,    8
 
         cmp     rax,    0
-        je      getDestination
+        je      getPiecePosition
 
     saveInputResults:
       mov     ax,    word[pieceRow]

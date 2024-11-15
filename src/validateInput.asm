@@ -90,8 +90,6 @@ section .text
       mov     rax, 1
       ret
     
-    ; TODO: Crear metodo para verificar que la pieza ingresada tenga movimientos posibles (Varia segun soldado y oficial)
-
 
   ;PRE-COND:
   ;     RECIBE EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO (Cada elemento es un byte)
