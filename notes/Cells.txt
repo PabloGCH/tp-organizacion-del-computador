@@ -1,0 +1,8 @@
+Los valores de las celdas representan lo siguiente:
+
+-1: Ausencia de celda
+ 0: Celda vacia
+ 1: Soldado
+ 2: Primer  oficial
+ 3: Segundo oficial
+

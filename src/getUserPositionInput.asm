@@ -1,6 +1,8 @@
 global getUserPositionInput
 extern gets
 extern validateInput
+extern validatePieceInput
+extern validateDestinationInput
 %include "macros.asm"
 
 section .data
@@ -19,18 +21,26 @@ section .bss
   inputText                    resb       100
   position       times 2       resw       1   ; row, column
   positions      times 4       resw       1   ; pieceRow, pieceColumn, destinationRow, destinationColumn
+  playerType                   resb       1
+  board                        resq       1
 
 
 
 
 section .text
-  ;PRE-COND:  LA SUBRUTINA NO TIENE PARAMETROS DE ENTRADA
+  ;PRE-COND:  LA SUBRUTINA RECIBE
+  ;           EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO
+  ;           EN RSI UN NUMERO QUE INDICA TIPO DE JUGADOR           
+              
   ;POST-COND: LA SUBRUTINA DEVUELVE UNA DIRECCION DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS
   ;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO          
   ;           EN ESE ORDEN. CADA ELEMENTO ES UN WORD (2 BYTES)
   ;TESTEAR:   PROBAR CON EL COMANDO "p/d *((short *) $rax)@4" DESDE GDB ANTES DE QUE TERMINE EL PROGRAMA
   ;           DEBERIA MOSTRAR LOS VALORES INGRESADOS POR EL USUARIO
   getUserPositionInput:
+    mov    qword[board],    rdi
+    mov    byte[playerType], sil
+    
     
     getPiecePosition:
       ; SE INICIALIZAN LA POSICION CON UN VALOR INVALIDO PARA QUE NO USE VALORES VIEJOS
@@ -68,6 +78,18 @@ section .text
 
         sub     rsp,    8
         call    validateInput
+        add     rsp,    8
+
+        cmp     rax,    0
+        je      getPiecePosition
+
+
+        mov     rdi,    qword[board]
+        mov     rsi,    position
+        mov     rdx,    qword[playerType]
+
+        sub     rsp,    8
+        call    validatePieceInput
         add     rsp,    8
 
         cmp     rax,    0
@@ -113,6 +135,17 @@ section .text
 
         cmp     rax,    0
         je      getDestination
+
+        mov     rdi,    qword[board]
+        mov     rsi,    position
+        mov     rdx,    qword[playerType]
+
+        sub     rsp,    8
+        call    validateDestinationInput
+        add     rsp,    8
+
+        cmp     rax,    0
+        je      getPiecePosition
 
     saveInputResults:
       mov     ax,    word[pieceRow]
