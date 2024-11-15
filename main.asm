@@ -4,6 +4,7 @@ global main
 ;TEST VALIDACION DE POSICION EXISTENTE Y CELDA NO OCUPADA
 extern getUserPositionInput
 extern printBoard
+extern printCurrentTurn
 
 section .data
   board         db      -1, -1,  1,  1,  1, -1, -1, \
@@ -19,9 +20,15 @@ section .data
 
 section .text
   main:
+
+    mov rdi, 0
+    sub rsp, 8
+    call printCurrentTurn
+    add rsp, 8
+
     mov rdi, board
     mov esi, [stronghold]
-    mov edx, [characters] 
+    mov edx, [characters]
 
     sub rsp, 8
     call printBoard
@@ -29,7 +36,7 @@ section .text
 
     mov rdi, board
     mov rsi, 0
-    
+
     sub     rsp,    8
     call getUserPositionInput
     add     rsp,    8
