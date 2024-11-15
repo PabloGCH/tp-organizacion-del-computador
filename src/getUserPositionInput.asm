@@ -2,6 +2,7 @@ global getUserPositionInput
 extern gets
 extern validateInput
 extern validatePieceInput
+extern validateDestinationInput
 %include "macros.asm"
 
 section .data
@@ -130,6 +131,17 @@ section .text
 
         sub     rsp,    8
         call    validateInput
+        add     rsp,    8
+
+        cmp     rax,    0
+        je      getDestination
+
+        mov     rdi,    qword[board]
+        mov     rsi,    position
+        mov     rdx,    qword[playerType]
+
+        sub     rsp,    8
+        call    validateDestinationInput
         add     rsp,    8
 
         cmp     rax,    0

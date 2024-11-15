@@ -1,6 +1,7 @@
 %include "macros.asm"
 global validateInput
 global validatePieceInput
+global validateDestinationInput
 
 section .data
   minValue     dw  1
@@ -8,10 +9,12 @@ section .data
   row          dw  0
   col          dw  0
   offset       dw  0
-  invalidInputMsg           db "Posicion invalida, intente de nuevo", 10, 0
-  invalidNoPieceMsg         db "No hay una pieza en la posicion ingresada", 10, 0
-  invalidNotYourPieceMsg    db "La pieza no te pertenece", 10, 0
-  invalidDestinationMsg     db "La casilla de destino no esta vacia", 10, 0
+  invalidInputMsg               db    "Posicion invalida, intente de nuevo", 10, 0
+  noPieceMsg                    db    "No hay una pieza en la posicion ingresada", 10, 0
+  notYourPieceMsg               db    "La pieza no te pertenece", 10, 0
+  destinationNotFreeMsg         db    "La casilla de destino no esta libre", 10, 0
+  destinationDoesNotExistMsg    db    "La casilla de destino no existe", 10, 0
+  
 
 
 section .text
@@ -89,13 +92,46 @@ section .text
     
     ; TODO: Crear metodo para verificar que la pieza ingresada tenga movimientos posibles (Varia segun soldado y oficial)
 
+
+  ;PRE-COND:
+  ;     RECIBE EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO (Cada elemento es un byte)
+  ;     RECIBE EN RSI LA DIRECCIÓN DE MEMORIA DE UN ARRAY DE 2 ELEMENTOS (DE 2 BYTES CADA UNO)
+  ;     RECIBE EN RDX UN NUMERO QUE INDICA TIPO DE JUGADOR 0 (Soldados) O 1 (Oficiales)
+  ;POST-COND: DEVUELVE EN RAX 0 SI LA POSICION DESTINO NO EXISTE O SI NO ESTA LIBRE
   validateDestinationInput:
-    validateDestinationIsFree:
+      ; CONSIGUE NUMEROS INGRESADOS
+      mov     ax,    word[rsi]
+      mov     word[row],    ax
+      mov     ax,    word[rsi + 2]
+      mov     word[col],    ax
+      ; CALCULA EL OFFSET SEGUN LA FILA
+      mov     ax,     word[row]
+      sub     ax,    1
+      imul    ax,    7                 ; row = (row - 1) * 7 (Se multiplica por 7 porque cada elemento de la matriz es un byte)
+      mov     word[offset], ax
+
+      ; CALCULA EL OFFSET SEGUN LA COLUMNA
+      mov     ax,    word[col]
+      sub     ax,    1     
+      add     ax,    word[offset]
+      mov     word[offset], ax
+
+      ; SE OBTIENE EL VALOR DE LA POSICIÓN EN LA MATRIZ DEL TABLERO
+      add     di,     word[offset]
+      mov     al,     byte[rdi]    
+
+      cmp     al,     -1
+      je      destinationDoesNotExist
+
+      cmp     al,     0
+      jne     destinationNotFree
+
+    mov     rax, 1
     ret
 
 
   invalidNoPiece:
-    print   invalidNoPieceMsg
+    print   noPieceMsg
     mov     rax,    0
     ret
 
@@ -105,9 +141,21 @@ section .text
     ret
 
   invalidNotYourPiece:
-    print   invalidNotYourPieceMsg
+    print   notYourPieceMsg
     mov     rax,    0
     ret
+
+  destinationDoesNotExist:
+    print   destinationDoesNotExistMsg
+    mov     rax,    0
+    ret
+
+  destinationNotFree:
+    print   destinationNotFreeMsg
+    mov     rax,    0
+    ret
+
+  
     
 
 
