@@ -19,18 +19,8 @@ extern printf
 global printBoard
 
 section .data
-    board db -1,-1,1,1,1,-1,-1, \
-             -1,-1,1,1,1,-1,-1, \
-               0,0,1,1,1,0,0, \
-               0,0,0,0,0,0,0, \
-               0,0,0,0,0,0,0, \
-             -1,-1,0,0,0,-1,-1, \
-             -1,-1,0,0,0,-1,-1
     bRows db 7
     bCols db 7
-    ; board db 0
-    ; bRows db 1
-    ; bCols db 1
     bCountRows db 0
     bCountCols db 0
 
@@ -54,22 +44,27 @@ section .bss
     bTotalOffset resb 1
     vect resb 4
     maxValue resb 1
+    board resq 1
+    stronghold times 4 resb 1
+    characters times 4 resb 1
 section .text
 
 printBoard:
-
+    mov [board], rdi
+    mov [stronghold], esi
+    mov [characters], edx
 loopRows:
-    xor rax, rax
+    xor al, al
     mov al, [bCountRows]
     cmp al, [bRows]
     jge doneLoopRows
 
-    xor rbx,rbx
-    mov rcx, rax
+    xor bl,bl
+    mov cl, al
     mov bl, [bCols]
     imul rcx, rbx
 
-    mov [bOffsetRows], rcx
+    mov [bOffsetRows], cl
     sub rsp, 8
     call loopCols
     add rsp, 8
@@ -97,13 +92,13 @@ printDownCrossAndLine:
     jmp loopRows
 
 loopCols:
-    xor rax, rax
+    xor al, al
     mov al, [bCountCols]
     cmp al, [bCols]
     jge doneLoopCols
-    mov rcx, [bOffsetRows]
-    add rcx, rax
-    mov [bTotalOffset], rcx
+    mov cl, [bOffsetRows]
+    add cl, al
+    mov [bTotalOffset], cl
 
     cmp byte [repeatFlag], 1
     je printCrossAndUp
@@ -120,9 +115,11 @@ doneLoopCols:
 
 printCrossAndUp:
     resetVector vect
+    xor rbx, rbx
     xor rcx, rcx
     mov bl, [bTotalOffset]
-    mov al, [board + rbx]
+    mov r8, [board]
+    mov al, [r8 + rbx]
     mov byte [vect+rcx], al
     inc rcx
     mov al, [bCountRows]
@@ -130,11 +127,8 @@ printCrossAndUp:
     jle skipUp
     mov bl, [bTotalOffset]
     sub bl, [bCols]
-    mov al, [board + rbx]
+    mov al, [r8 + rbx]
     mov byte [vect+rcx], al
-
-; 0 1
-; 2 3
 
 skipUp:
     inc rcx
@@ -143,7 +137,8 @@ skipUp:
     cmp al, 0
     jle skipPrevious
     dec rbx
-    mov al, [board + rbx]
+    mov r8, [board]
+    mov al, [r8 + rbx]
     mov byte [vect+rcx], al
 skipPrevious:
     inc rcx
@@ -156,7 +151,7 @@ skipPrevious:
     mov bl, [bTotalOffset]
     sub bl, [bCols]
     dec bl
-    mov al, [board + rbx]
+    mov al, [r8 + rbx]
     mov byte [vect+rcx], al
 skipPreviousUp:
     lea rdi, [vect]
@@ -231,14 +226,11 @@ printUpNormal:
     ret
 
 printLeftAndData:
-       mov rcx, 4
-loopResetVect2:
-    mov byte [vect+rcx], -1
-    loop loopResetVect2
-
+    resetVector vect
     mov rcx, 0
     mov bl, [bTotalOffset]
-    mov al, [board + rbx]
+    mov r8, [board]
+    mov al, [r8 + rbx]
     mov byte [vect+rcx], al
 
     mov al, [bCountCols]
@@ -246,7 +238,7 @@ loopResetVect2:
     jle skipPrevious2
     dec rbx
     inc rcx
-    mov al, [board + rbx]
+    mov al, [r8 + rbx]
     mov byte [vect+rcx], al
 skipPrevious2:
     lea rdi, [vect]

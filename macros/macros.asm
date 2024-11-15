@@ -41,12 +41,11 @@
 
 %macro resetVector 1
     mov rdi, %1
-    mov rcx, 4
-loopResetVect:
-    mov byte [rdi+rcx], -1
-    loop loopResetVect
+    mov byte[rdi], -1
+    mov byte[rdi+1], -1
+    mov byte[rdi+2], -1
+    mov byte[rdi+3], -1
 %endmacro
-
 
 extern  printf
 extern  gets
