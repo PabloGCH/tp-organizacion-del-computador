@@ -137,42 +137,42 @@ verifyDrownedOfficer:
     call checkPosition
     add rsp, 8
 
-    inc dil
-    sub rsp, 8
-    call checkPosition
-    add rsp, 8
-
-    inc dil
-    sub rsp, 8
-    call checkPosition
-    add rsp, 8
-    dec dil
     inc sil
-
-    dec dil
     sub rsp, 8
     call checkPosition
     add rsp, 8
 
+    inc sil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
     inc dil
-    inc dil
+    dec sil
+
+    dec sil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc sil
+    inc sil
     sub rsp, 8
     call checkPosition
     add rsp, 8
     dec cl
 
+    dec sil
+    inc dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
     inc sil
-    dec dil
     sub rsp, 8
     call checkPosition
     add rsp, 8
 
-    inc dil
-    sub rsp, 8
-    call checkPosition
-    add rsp, 8
-
-    inc dil
+    inc sil
     sub rsp, 8
     call checkPosition
     add rsp, 8
