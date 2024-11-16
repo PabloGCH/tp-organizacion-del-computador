@@ -392,7 +392,7 @@ section .text
       add     rsp,    8
 
       cmp     ax,    0
-      jl      notGettingCloserToStronghold
+      jge     notGettingCloserToStronghold
 
       mov     rax,    1   ; PASO LA VALIDACION
       ret
@@ -437,7 +437,7 @@ section .text
       add     rsp,    8
 
       cmp     ax,    0
-      jl      notGettingCloserToStronghold
+      jle     notGettingCloserToStronghold
 
       mov     rax,    1   ; PASO LA VALIDACION
       ret
@@ -482,7 +482,7 @@ section .text
       add     rsp,    8
 
       cmp     ax,    0
-      jl      notGettingCloserToStronghold
+      jle     notGettingCloserToStronghold
 
       mov     rax,    1   ; PASO LA VALIDACION
       ret
@@ -526,7 +526,7 @@ section .text
       add     rsp,    8
 
       cmp     ax,    0
-      jl      notGettingCloserToStronghold
+      jge     notGettingCloserToStronghold
 
       mov     rax,    1   ; PASO LA VALIDACION
       ret
