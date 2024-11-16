@@ -1,20 +1,24 @@
 global main
 %include "macros.asm"
 
-;TEST VALIDACION DE POSICION EXISTENTE Y CELDA NO OCUPADA
+; FUNCIONES EXTERNAS
+extern system 
+
+; SUBRUTINAS
 extern getUserPositionInput
 extern printBoard
 extern printCurrentTurn
 extern movePiece
 
 section .data
-  board         db      -1, -1,  1,  1,  1, -1, -1, \
-                        -1, -1,  0,  0,  1, -1, -1, \
-                         1,  1,  0,  0,  1,  1,  1, \
-                         0,  1,  1,  0,  1,  1,  1, \
-                         0,  1,  0,  0,  0,  1,  1, \
-                        -1, -1,  0,  0,  3, -1, -1, \
-                        -1, -1,  2,  0,  0, -1, -1
+  cmd_clear             db      "clear", 0
+  board                 db      -1, -1,  1,  1,  1, -1, -1, \
+                                -1, -1,  0,  0,  1, -1, -1, \
+                                 1,  1,  0,  0,  1,  1,  1, \
+                                 0,  1,  1,  0,  1,  1,  1, \
+                                 0,  1,  0,  0,  0,  1,  1, \
+                                -1, -1,  0,  0,  3, -1, -1, \
+                                -1, -1,  2,  0,  0, -1, -1
 
   stronghold            db       2,  4,  4,  6
   strongholdDir         db       2                  ; 0 = Up, 1 = Right, 2 = Down, 3 = Left
@@ -23,6 +27,10 @@ section .data
 
 section .text
   main:
+    mov rdi, cmd_clear
+    sub rsp, 8
+    call system
+    add rsp, 8
 
     mov rdi, 0
     sub rsp, 8
@@ -52,6 +60,11 @@ section .text
     sub     rsp,    8
     call    movePiece
     add     rsp,    8
+
+    mov rdi, cmd_clear
+    sub rsp, 8
+    call system
+    add rsp, 8
 
     mov rdi, 1
     sub rsp, 8
