@@ -3,6 +3,8 @@ extern gets
 extern validateInput
 extern validatePieceInput
 extern validateDestinationInput
+extern movementIsPossible
+
 %include "macros.asm"
 
 section .data
@@ -23,6 +25,7 @@ section .bss
   positions      times 4       resw       1   ; pieceRow, pieceColumn, destinationRow, destinationColumn
   playerType                   resb       1
   board                        resq       1
+  strongholdDir                resb       1
 
 
 
@@ -31,6 +34,7 @@ section .text
   ;PRE-COND:  LA SUBRUTINA RECIBE
   ;           EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO
   ;           EN RSI UN NUMERO QUE INDICA TIPO DE JUGADOR           
+  ;           EN RDX LA DIRECCION DE LA FORTALEZA
               
   ;POST-COND: LA SUBRUTINA DEVUELVE UNA DIRECCION DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS
   ;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO          
@@ -40,6 +44,7 @@ section .text
   getUserPositionInput:
     mov    qword[board],    rdi
     mov    byte[playerType], sil
+    mov    byte[strongholdDir], dl
     
     
     getPiecePosition:
@@ -147,6 +152,7 @@ section .text
         cmp     rax,    0
         je      getPiecePosition
 
+    
     saveInputResults:
       mov     ax,    word[pieceRow]
       mov     word[positions],        ax
@@ -156,14 +162,21 @@ section .text
       mov     word[positions + 4],    ax
       mov     ax,    word[destinationColumn]
       mov     word[positions + 6],    ax
-      mov     rax,    positions
-    ret
-
     
+    validateIfMovementIsPossible:
+      mov     rdi,    qword[board]
+      mov     rsi,    positions
+      mov     rdx,    qword[playerType]
+      mov     cl,     byte[strongholdDir]
 
+      sub     rsp,    8
+      call    movementIsPossible
+      add     rsp,    8
 
-
-
-
-
+      cmp     rax,    0
+      je      getPiecePosition
+    
+    
+    mov     rax,    positions
+    ret
 

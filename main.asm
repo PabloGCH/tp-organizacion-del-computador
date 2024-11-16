@@ -8,15 +8,17 @@ extern printCurrentTurn
 
 section .data
   board         db      -1, -1,  1,  1,  1, -1, -1, \
-                        -1, -1,  1,  1,  1, -1, -1, \
-                         1,  1,  1,  1,  1,  1,  1, \
-                         1,  1,  1,  1,  1,  1,  1, \
-                         1,  1,  0,  0,  0,  1,  1, \
+                        -1, -1,  0,  0,  1, -1, -1, \
+                         1,  1,  0,  0,  1,  1,  1, \
+                         0,  1,  1,  0,  1,  1,  1, \
+                         0,  1,  0,  0,  0,  1,  1, \
                         -1, -1,  0,  0,  3, -1, -1, \
                         -1, -1,  2,  0,  0, -1, -1
 
-  stronghold    db       2,  4,  4,  6
-  characters    db      'XO ', 0
+  stronghold            db       2,  4,  4,  6
+  strongholdDir         db       2                  ; 0 = Up, 1 = Right, 2 = Down, 3 = Left
+
+  characters            db      'XO ', 0
 
 section .text
   main:
@@ -36,6 +38,7 @@ section .text
 
     mov rdi, board
     mov rsi, 0
+    mov dl, byte[strongholdDir]
 
     sub     rsp,    8
     call getUserPositionInput
@@ -44,6 +47,7 @@ section .text
 
     mov rdi, board
     mov rsi, 1
+    mov dl, byte[strongholdDir]
 
     sub     rsp,    8
     call getUserPositionInput
