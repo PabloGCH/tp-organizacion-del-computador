@@ -1,8 +1,8 @@
 global main
 %include "macros.asm"
 
-extern getStatCounter
-extern setStatCounter
+extern statCounterGet
+extern statCounterSet
 
 section .data
     msg db "The value is: %li.", 10, 0
@@ -16,11 +16,11 @@ section .text
     main:
         lea rsi, array
         mov rdi, 2
-        mov dl, 1
-        call setStatCounter
+        mov dl, 116
+        call statCounterSet
         lea rsi, array
         mov rdi, 2
-        call getStatCounter
+        call statCounterGet
         mov byte[result], al
         printArg msg, result
 
