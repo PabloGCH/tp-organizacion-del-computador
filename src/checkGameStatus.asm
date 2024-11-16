@@ -52,10 +52,6 @@ loopRows:
     inc byte [bCountRows]
     jmp loopRows
 doneLoopRows:
-    printArg data, soldiersCount
-    printArg data, soldiersInStrongholdCount
-    printArg data, officersCount
-
     cmp byte [soldiersCount], 9
     jl officersWin
     cmp byte [officersCount], 0
@@ -127,7 +123,12 @@ skipStrongholdCount:
 
 incrementOfficer:
     inc byte [officersCount]
+    sub rsp, 8
+    call verifyDrownedOfficer
+    add rsp, 8
+    ret
 
+verifyDrownedOfficer:
     ret
 
 soldiersWin:
