@@ -27,10 +27,7 @@ section .data
 
 section .text
   main:
-    mov rdi, cmd_clear
-    sub rsp, 8
-    call system
-    add rsp, 8
+    command cmd_clear
 
     mov rdi, 0
     sub rsp, 8
@@ -61,10 +58,7 @@ section .text
     call    movePiece
     add     rsp,    8
 
-    mov rdi, cmd_clear
-    sub rsp, 8
-    call system
-    add rsp, 8
+    command cmd_clear
 
     mov rdi, 1
     sub rsp, 8
@@ -79,7 +73,6 @@ section .text
     call printBoard
     add rsp, 8
 
-
     mov rdi, board
     mov rsi, 1
     mov dl, byte[strongholdDir]
@@ -87,6 +80,20 @@ section .text
     sub     rsp,    8
     call getUserPositionInput
     add     rsp,    8
+
+    sub     rsp,    8
+    call    movePiece
+    add     rsp,    8
+
+    command cmd_clear
+
+    mov rdi, board
+    mov esi, [stronghold]
+    mov edx, [characters]
+
+    sub rsp, 8
+    call printBoard
+    add rsp, 8
 
 
 ;TEST DE PRINT STATS
