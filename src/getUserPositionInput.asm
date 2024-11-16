@@ -180,11 +180,3 @@ section .text
     mov     rax,    positions
     ret
 
-    
-
-
-
-
-
-
-
