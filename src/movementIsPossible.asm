@@ -387,10 +387,6 @@ section .text
       mov     ax,    word[rsi]
       sub     ax,    word[rsi + 4]
 
-      sub     rsp,    8
-      call    calculateModuleOfAx
-      add     rsp,    8
-
       cmp     ax,    0
       jge     notGettingCloserToStronghold
 
@@ -431,10 +427,6 @@ section .text
       ; EN EL CASO CONTRARIO, VERIFICAR QUE LA COLUMNA DESTINO ES MENOR A LA COLUMNA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
       mov     ax,    word[rsi + 2]
       sub     ax,    word[rsi + 6]
-
-      sub     rsp,    8
-      call    calculateModuleOfAx
-      add     rsp,    8
 
       cmp     ax,    0
       jle     notGettingCloserToStronghold
@@ -477,10 +469,6 @@ section .text
       mov     ax,    word[rsi]
       sub     ax,    word[rsi + 4]
 
-      sub     rsp,    8
-      call    calculateModuleOfAx
-      add     rsp,    8
-
       cmp     ax,    0
       jle     notGettingCloserToStronghold
 
@@ -520,10 +508,6 @@ section .text
       ; EN EL CASO CONTRARIO, VERIFICAR QUE LA COLUMNA DESTINO ES MAYOR A LA COLUMNA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
       mov     ax,    word[rsi + 2]
       sub     ax,    word[rsi + 6]
-
-      sub     rsp,    8
-      call    calculateModuleOfAx
-      add     rsp,    8
 
       cmp     ax,    0
       jge     notGettingCloserToStronghold
