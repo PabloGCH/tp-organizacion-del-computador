@@ -164,7 +164,7 @@ section .text
       mov     word[positions + 6],    ax
     
     validateIfMovementIsPossible:
-      mov     rdi,    board
+      mov     rdi,    qword[board]
       mov     rsi,    positions
       mov     rdx,    qword[playerType]
       mov     cl,     byte[strongholdDir]

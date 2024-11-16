@@ -20,7 +20,6 @@ section .data
 
 section .bss
   board                                 resq  1
-  movingSideWays                        resb  1
 
 
 
@@ -131,7 +130,6 @@ section .text
       ret
 
   validateNotMovingSideways:
-    mov     byte[movingSideWays],    0
 
     cmp     byte[strongholdDir],    0  
     je      validateNotMovingSidewaysWithStrongholdUp
@@ -158,16 +156,22 @@ section .text
       notMovingSideWaysWithStrongholdDown:
         ; SI NO SE ESTA MOVIENDO HACIA LOS COSTADOS SE VERIFICA QUE ABAJO NO HAYA UN -1
         ; YA QUE DESDE ESA POSICION SOLO SE PUEDE MOVER HACIA LOS COSTADOS
+
         mov     ax,    word[rsi]
-        imul    ax,    7                  ; No se le resta 1 porque queremos la fila de siguiente, no la actual
+        imul    ax,    7                  ; No se le resta 1 porque busca la fila la celda siguiente, no la actual
+
         mov     di,    word[rsi + 2]
         sub     di,    1
         add     ax,    di
-        mov     rdx,    qword[board]
+
+        mov     rdx,   qword[board]
         add     dx,    ax
+
         mov     al,    byte[rdx]
+
         cmp     al,    -1
         je      canOnlyMoveSideWays
+        jmp     sideWaysMovementValidationPassed
       
       movingSideWaysWithStrongholdDown:
         ; SI ESTA EN LA ULTIMA FILA NO HAY NADA ABAJO. POR LO TANTO NO SE PUEDE MOVER HACIA LOS COSTADOS
@@ -178,6 +182,7 @@ section .text
         ; SI NO ESTA EN LA ULTIMA FILA, SE VALIDA SI HAY UN -1 EN LA CELDA DE ABAJO, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
         mov     ax,    word[rsi]
         imul    ax,    7                  ; No se le resta 1 porque queremos la fila de siguiente, no la actual
+
         mov     di,    word[rsi + 2]
         sub     di,    1
 
