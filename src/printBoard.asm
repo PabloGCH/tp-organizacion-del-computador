@@ -52,12 +52,17 @@ section .bss
     stronghold times 4 resb 1
     characters times 4 resb 1
     characterAux resb 1
+
 section .text
 
 printBoard:
     mov [board], rdi
     mov [stronghold], esi
     mov [characters], edx
+    mov byte [bOffsetRows], 0
+    mov byte [bTotalOffset],0
+    mov byte [bCountRows], 0
+    mov byte [bCountCols], 0
 
     print newLine
     print colsIndex
