@@ -8,8 +8,8 @@ section .bss
     value resb 1
 
 section .text
-    global getStatCounter
-    getStatCounter:
+    global statCounterGet
+    statCounterGet:
     add rsi, rdi ; Aumenta RSI la cantidad de bytes indicada por DIL
     lea rdi, [value] ; RDI apunta a value
     mov rcx, 1 ; Cantidad de bytes a copiar (1)
