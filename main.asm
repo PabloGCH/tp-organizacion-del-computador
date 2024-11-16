@@ -81,7 +81,9 @@ section .text
       call checkGameStatus
       add rsp, 8
 
-      cmp rax, -1
+      mov [gameStatus], al
+
+      cmp byte [gameStatus], -1
       jne gameOver
 
       ; TURNO DE OFICIALES
