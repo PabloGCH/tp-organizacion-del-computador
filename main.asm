@@ -26,6 +26,9 @@ section .data
 
   characters            db      'XO ', 0
 
+section .bss
+  gameStatus resb 1
+
 section .text
   main:
     mainGameLoop:
@@ -44,6 +47,14 @@ section .text
       sub rsp, 8
       call printBoard
       add rsp, 8
+
+      mov rdi, board
+      mov esi, [stronghold]
+      sub rsp, 8
+      call checkGameStatus
+      add rsp, 8
+
+      mov [gameStatus], al
 
       mov rdi, board
       mov rsi, 0
@@ -105,7 +116,15 @@ section .text
       call checkGameStatus
       add rsp, 8
 
-      cmp rax, -1
+      mov rdi, board
+      mov esi, [stronghold]
+      sub rsp, 8
+      call checkGameStatus
+      add rsp, 8
+
+      mov [gameStatus], al
+
+      cmp byte [gameStatus], -1
       je mainGameLoop
   gameOver:
     ret

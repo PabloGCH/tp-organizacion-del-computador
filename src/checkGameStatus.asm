@@ -132,13 +132,13 @@ verifyDrownedOfficer:
     ret
 
 soldiersWin:
-    mov rax, 0
+    mov al, 0
     ret
 
 officersWin:
-    mov rax, 1
+    mov al, 1
     ret
 
 gameContinue:
-    mov rax, -1
+    mov al, -1
     ret
