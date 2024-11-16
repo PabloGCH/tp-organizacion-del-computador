@@ -5,6 +5,7 @@ global main
 extern getUserPositionInput
 extern printBoard
 extern printCurrentTurn
+extern movePiece
 
 section .data
   board         db      -1, -1,  1,  1,  1, -1, -1, \
@@ -41,8 +42,29 @@ section .text
     mov dl, byte[strongholdDir]
 
     sub     rsp,    8
-    call getUserPositionInput
+    call    getUserPositionInput
     add     rsp,    8
+    
+    mov rdi, board
+    mov rsi, rax
+    mov dl, byte[strongholdDir]
+    
+    sub     rsp,    8
+    call    movePiece
+    add     rsp,    8
+
+    mov rdi, 1
+    sub rsp, 8
+    call printCurrentTurn
+    add rsp, 8
+
+    mov rdi, board
+    mov esi, [stronghold]
+    mov edx, [characters]
+
+    sub rsp, 8
+    call printBoard
+    add rsp, 8
 
 
     mov rdi, board
