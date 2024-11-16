@@ -180,20 +180,171 @@ section .text
         je      sideWaysMovementValidationPassed
 
         jmp     cannotMoveSideways
-      
 
     validateNotMovingSidewaysWithStrongholdLeft:
-      ; INICIO Y DESTINO NO PUEDEN COMPARTIR COLUMNA
-      jmp     sideWaysMovementValidationPassed
+      ; SE VERIFICA SI ESTA INTENTANDO MOVERSE A LOS COSTADOS
+      mov     ax,    word[rsi + 2]
+      sub     ax,    word[rsi + 6]
+
+      cmp     ax,    0
+      je      movingSideWaysWithStrongholdLeft
+      
+      notMovingSideWaysWithStrongholdLeft:
+        ; SI NO SE ESTA MOVIENDO HACIA LOS COSTADOS SE VERIFICA QUE A LA IZQUIERDA NO HAYA UN -1
+        ; YA QUE DESDE ESA POSICION SOLO SE PUEDE MOVER HACIA LOS COSTADOS
+        mov     ax,    word[rsi]
+        sub     ax,    1
+        imul    ax,    7
+        
+        mov     di,    word[rsi + 2]
+        sub     di,    1
+        
+        add     ax,    di
+        
+        mov     rdx,    qword[board]
+        add     dx,    ax
+
+        mov     al,    byte[rdx]
+
+        cmp     al,    -1
+        je      canOnlyMoveSideWays
+        jmp     sideWaysMovementValidationPassed
+    
+      movingSideWaysWithStrongholdLeft:
+        ; SI ESTA EN LA PRIMERA COLUMNA NO HAY NADA A LA IZQUIERDA. POR LO TANTO NO SE PUEDE MOVER HACIA LOS COSTADOS
+        mov     ax,    word[rsi + 2]
+        cmp     ax,    1
+        je      cannotMoveSideways
+
+        ; SI NO ESTA EN LA PRIMERA COLUMNA, SE VALIDA SI HAY UN -1 EN LA CELDA DE LA IZQUIERDA, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
+        mov     ax,    word[rsi]
+        sub     ax,    1
+        imul    ax,    7
+        
+        mov     di,    word[rsi + 2]
+        sub     di,    1
+        
+        add     ax,    di
+        
+        mov     rdx,    qword[board]
+        add     dx,    ax
+        mov     al,    byte[rdx]
+  
+        cmp     al,    -1
+        je      sideWaysMovementValidationPassed
+
+        jmp     cannotMoveSideways
+ 
 
     validateNotMovingSidewaysWithStrongholdUp:
-      ; INICIO Y DESTINO NO PUEDEN COMPARTIR FILA
-      jmp     sideWaysMovementValidationPassed
+      ; SE VERIFICA SI ESTA INTENTANDO MOVERSE A LOS COSTADOS
+      mov     ax,    word[rsi]
+      sub     ax,    word[rsi + 4]
+
+      cmp     ax,    0
+      je      movingSideWaysWithStrongholdUp
+
+      notMovingSideWaysWithStrongholdUp:
+        ; SI NO SE ESTA MOVIENDO HACIA LOS COSTADOS SE VERIFICA QUE ARRIBA NO HAYA UN -1
+        ; YA QUE DESDE ESA POSICION SOLO SE PUEDE MOVER HACIA LOS COSTADOS
+        mov     ax,    word[rsi]
+        sub     ax,    1
+        imul    ax,    7
+        
+        mov     di,    word[rsi + 2]
+        sub     di,    1
+    
+        add     ax,    di
+
+        mov     rdx,    qword[board]
+        add     dx,    ax
+
+        mov     al,    byte[rdx]
+
+        cmp     al,    -1
+        je      canOnlyMoveSideWays
+
+        jmp     sideWaysMovementValidationPassed
+
+      movingSideWaysWithStrongholdUp:
+        ; SI ESTA EN LA PRIMERA FILA NO HAY NADA ARRIBA. POR LO TANTO NO SE PUEDE MOVER HACIA LOS COSTADOS
+        mov     ax,    word[rsi]
+        cmp     ax,    1
+        je      cannotMoveSideways
+
+        ; SI NO ESTA EN LA PRIMERA FILA, SE VALIDA SI HAY UN -1 EN LA CELDA DE ARRIBA, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
+        mov     ax,    word[rsi]
+        sub     ax,    1
+        imul    ax,    7
+        
+        mov     di,    word[rsi + 2]
+        sub     di,    1
+        
+        add     ax,    di
+        
+        mov     rdx,    qword[board]
+        add     dx,    ax
+        mov     al,    byte[rdx]
+  
+        cmp     al,    -1
+        je      sideWaysMovementValidationPassed
+
+        jmp     cannotMoveSideways
+
 
     validateNotMovingSidewaysWithStrongholdRight:
-      ; INICIO Y DESTINO NO PUEDEN COMPARTIR COLUMNA
-      jmp     sideWaysMovementValidationPassed
+      ; SE VERIFICA SI ESTA INTENTANDO MOVERSE A LOS COSTADOS
+      mov     ax,    word[rsi + 2]
+      sub     ax,    word[rsi + 6]
 
+      cmp     ax,    0
+      je      movingSideWaysWithStrongholdRight
+
+      notMovingSideWaysWithStrongholdRight:
+        ; SI NO SE ESTA MOVIENDO HACIA LOS COSTADOS SE VERIFICA QUE A LA DERECHA NO HAYA UN -1
+        ; YA QUE DESDE ESA POSICION SOLO SE PUEDE MOVER HACIA LOS COSTADOS
+        mov     ax,    word[rsi]
+        imul    ax,    7
+        
+        mov     di,    word[rsi + 2]
+        add     di,    1
+        
+        add     ax,    di
+        
+        mov     rdx,    qword[board]
+        add     dx,    ax
+    
+        mov     al,    byte[rdx]
+        
+        cmp     al,    -1
+        je      canOnlyMoveSideWays
+
+        jmp     sideWaysMovementValidationPassed
+
+      movingSideWaysWithStrongholdRight:
+        ; SI ESTA EN LA ULTIMA COLUMNA NO HAY NADA A LA DERECHA. POR LO TANTO NO SE PUEDE MOVER HACIA LOS COSTADOS
+        mov     ax,    word[rsi + 2]
+        cmp     ax,    8
+        je      cannotMoveSideways
+
+        ; SI NO ESTA EN LA ULTIMA COLUMNA, SE VALIDA SI HAY UN -1 EN LA CELDA DE LA DERECHA, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
+        mov     ax,    word[rsi]
+        imul    ax,    7
+        
+        mov     di,    word[rsi + 2]
+        add     di,    1
+    
+        add     ax,    di
+        
+        mov     rdx,    qword[board]
+        add     dx,    ax
+
+        mov     al,    byte[rdx]
+
+        cmp     al,    -1
+        je      sideWaysMovementValidationPassed
+
+        jmp     cannotMoveSideways
 
     sideWaysMovementValidationPassed:
       mov     rax,    1
@@ -231,6 +382,7 @@ section .text
       mov     ax,    word[rsi]
       cmp     ax,    word[rsi + 4]
       je      validateGettingCloserToStrongholdDownSideWays
+
       ; EN EL CASO CONTRARIO, VERIFICAR QUE LA FILA DESTINO ES MAYOR A LA FILA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
       mov     ax,    word[rsi]
       sub     ax,    word[rsi + 4]
@@ -271,21 +423,142 @@ section .text
 
 
     validateGettingCloserToStrongholdLeft:
+      ; SI LA COLUMNA DE INICIO Y FINAL SON IGUALES SE ESTA MOVIENDO A "LOS COSTADOS"
+      mov     ax,    word[rsi + 2]
+      cmp     ax,    word[rsi + 6]
+      je      validateGettingCloserToStrongholdLeftSideWays
+
+      ; EN EL CASO CONTRARIO, VERIFICAR QUE LA COLUMNA DESTINO ES MENOR A LA COLUMNA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
+      mov     ax,    word[rsi + 2]
+      sub     ax,    word[rsi + 6]
+
+      sub     rsp,    8
+      call    calculateModuleOfAx
+      add     rsp,    8
+
+      cmp     ax,    0
+      jl      notGettingCloserToStronghold
+
+      mov     rax,    1   ; PASO LA VALIDACION
+      ret
+      validateGettingCloserToStrongholdLeftSideWays:
+        mov   word[distance],    0
+        ; SE CALCULA LA DISTANCIA ENTRE LA FILA DE INICIO Y EL CENTRO
+        mov   ax,    word[rsi]
+        sub   ax,    4
+        
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+      
+        mov   word[distance],    ax
+        ; SE CALCULA LA DISTANCIA ENTRE LA FILA DE DESTINO Y EL CENTRO
+        mov   ax,    word[rsi + 4]
+        sub   ax,    4
+        
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+      
+        cmp   ax,    word[distance]
+        jge   notGettingCloserToStronghold
+        
+        mov   rax,    1      ; PASO LA VALIDACION
+        ret
 
 
     validateGettingCloserToStrongholdUp:
+      ; SI LA FILA DE INICIO Y FINAL SON IGUALES SE ESTA MOVIENDO A "LOS COSTADOS"
+      mov     ax,    word[rsi]
+      cmp     ax,    word[rsi + 4]
+      je      validateGettingCloserToStrongholdUpSideWays
 
+      ; EN EL CASO CONTRARIO, VERIFICAR QUE LA FILA DESTINO ES MENOR A LA FILA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
+      mov     ax,    word[rsi]
+      sub     ax,    word[rsi + 4]
+
+      sub     rsp,    8
+      call    calculateModuleOfAx
+      add     rsp,    8
+
+      cmp     ax,    0
+      jl      notGettingCloserToStronghold
+
+      mov     rax,    1   ; PASO LA VALIDACION
+      ret
+      validateGettingCloserToStrongholdUpSideWays:
+        mov   word[distance],    0
+        ; SE CALCULA LA DISTANCIA ENTRE LA COLUMNA DE INICIO Y EL CENTRO
+        mov   ax,    word[rsi + 2]
+        sub   ax,    4
+        
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+      
+        mov   word[distance],    ax
+        ; SE CALCULA LA DISTANCIA ENTRE LA COLUMNA DE DESTINO Y EL CENTRO
+        mov   ax,    word[rsi + 6]
+        sub   ax,    4
+        
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+      
+        cmp   ax,    word[distance]
+        jge   notGettingCloserToStronghold
+        
+        mov   rax,    1      ; PASO LA VALIDACION
+        ret
 
     validateGettingCloserToStrongholdRight:
-   
+      ; SI LA COLUMNA DE INICIO Y FINAL SON IGUALES SE ESTA MOVIENDO A "LOS COSTADOS"
+      mov     ax,    word[rsi + 2]
+      cmp     ax,    word[rsi + 6]
+      je      validateGettingCloserToStrongholdRightSideWays
+
+      ; EN EL CASO CONTRARIO, VERIFICAR QUE LA COLUMNA DESTINO ES MAYOR A LA COLUMNA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
+      mov     ax,    word[rsi + 2]
+      sub     ax,    word[rsi + 6]
+
+      sub     rsp,    8
+      call    calculateModuleOfAx
+      add     rsp,    8
+
+      cmp     ax,    0
+      jl      notGettingCloserToStronghold
+
+      mov     rax,    1   ; PASO LA VALIDACION
+      ret
+      validateGettingCloserToStrongholdRightSideWays:
+        mov   word[distance],    0
+        ; SE CALCULA LA DISTANCIA ENTRE LA FILA DE INICIO Y EL CENTRO
+        mov   ax,    word[rsi]
+        sub   ax,    4
+      
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+    
+        mov   word[distance],    ax
+        ; SE CALCULA LA DISTANCIA ENTRE LA FILA DE DESTINO Y EL CENTRO
+        mov   ax,    word[rsi + 4]
+        sub   ax,    4
+
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+
+        cmp   ax,    word[distance]
+        jge   notGettingCloserToStronghold
+    
+        mov   rax,    1      ; PASO LA VALIDACION
+        ret
 
     notGettingCloserToStronghold:
       mov     qword[errorMsg],    canOnlyMoveTowardsStrongholdMsg
       mov     rax,    0
       ret
-
-
-
 
   calculateModuleOfAx:
     cmp     ax,    0
@@ -294,8 +567,4 @@ section .text
     negative:
       neg     ax
       ret
-
-
-
-
 
