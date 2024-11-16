@@ -9,6 +9,7 @@ extern getUserPositionInput
 extern printBoard
 extern printCurrentTurn
 extern movePiece
+extern checkGameStatus
 
 section .data
   cmd_clear             db      "clear", 0
@@ -27,73 +28,87 @@ section .data
 
 section .text
   main:
-    command cmd_clear
+    mainGameLoop:
+      command cmd_clear
+      ; TURNO DE SOLDADOS
 
-    mov rdi, 0
-    sub rsp, 8
-    call printCurrentTurn
-    add rsp, 8
+      mov rdi, 0
+      sub rsp, 8
+      call printCurrentTurn
+      add rsp, 8
 
-    mov rdi, board
-    mov esi, [stronghold]
-    mov edx, [characters]
+      mov rdi, board
+      mov esi, [stronghold]
+      mov edx, [characters]
 
-    sub rsp, 8
-    call printBoard
-    add rsp, 8
+      sub rsp, 8
+      call printBoard
+      add rsp, 8
 
-    mov rdi, board
-    mov rsi, 0
-    mov dl, byte[strongholdDir]
+      mov rdi, board
+      mov rsi, 0
+      mov dl, byte[strongholdDir]
 
-    sub     rsp,    8
-    call    getUserPositionInput
-    add     rsp,    8
-    
-    mov rdi, board
-    mov rsi, rax
-    mov dl, byte[strongholdDir]
-    
-    sub     rsp,    8
-    call    movePiece
-    add     rsp,    8
+      sub     rsp,    8
+      call    getUserPositionInput
+      add     rsp,    8
+      
+      mov rdi, board
+      mov rsi, rax
+      mov dl, byte[strongholdDir]
+      
+      sub     rsp,    8
+      call    movePiece
+      add     rsp,    8
 
-    command cmd_clear
+      command cmd_clear
 
-    mov rdi, 1
-    sub rsp, 8
-    call printCurrentTurn
-    add rsp, 8
+      mov rdi, board
+      mov esi, [stronghold]
 
-    mov rdi, board
-    mov esi, [stronghold]
-    mov edx, [characters]
+      sub rsp, 8
+      call checkGameStatus
+      add rsp, 8
 
-    sub rsp, 8
-    call printBoard
-    add rsp, 8
+      cmp rax, -1
+      jne gameOver
 
-    mov rdi, board
-    mov rsi, 1
-    mov dl, byte[strongholdDir]
+      ; TURNO DE OFICIALES
 
-    sub     rsp,    8
-    call getUserPositionInput
-    add     rsp,    8
+      mov rdi, 1
+      sub rsp, 8
+      call printCurrentTurn
+      add rsp, 8
 
-    sub     rsp,    8
-    call    movePiece
-    add     rsp,    8
+      mov rdi, board
+      mov esi, [stronghold]
+      mov edx, [characters]
 
-    command cmd_clear
+      sub rsp, 8
+      call printBoard
+      add rsp, 8
 
-    mov rdi, board
-    mov esi, [stronghold]
-    mov edx, [characters]
+      mov rdi, board
+      mov rsi, 1
+      mov dl, byte[strongholdDir]
 
-    sub rsp, 8
-    call printBoard
-    add rsp, 8
+      sub     rsp,    8
+      call getUserPositionInput
+      add     rsp,    8
+
+      sub     rsp,    8
+      call    movePiece
+      add     rsp,    8
+
+
+      sub rsp, 8
+      call checkGameStatus
+      add rsp, 8
+
+      cmp rax, -1
+      je mainGameLoop
+  gameOver:
+    ret
 
 
 ;TEST DE PRINT STATS
