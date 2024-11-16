@@ -3,18 +3,12 @@ global movementIsPossible
 
 section .data
   strongholdDir                             db    0           ;  0 = Up, 1 = Right, 2 = Down, 3 = Left
-  strongholdPointOfReference                dw    0, 0        ;  Fila y columna fuera del tablero que sirve como punto de referencia para saber si una pieza se esta moviendo hacia la fortaleza o no.
   canOnlyMoveTowardsStrongholdMsg           db    "Solo se puede mover hacia la fortaleza",   10,     0
   cannotMoveMoreThanOnePositionMsg          db    "No se puede mover mas de una celda",       10,     0
   cannotMoveSidewaysMsg                     db    "No se puede mover hacia los costados",     10,     0
   fromThatPositionCanOnlyMoveSideWaysMsg    db    "Desde esa posicion solo se puede mover hacia los costados", 10, 0
   errorMsg                                  dq    0
-
-  distanceFromPieceToStronghold             dw    0
-  distanceFromDestinationToStronghold       dw    0
-
-  rowDistance                               dw    0
-  colDistance                               dw    0
+  distance                                  dw    0
 
 
 
@@ -54,10 +48,6 @@ section .text
       ; Validar que se este moviendo hacia la fortaleza
 
       sub     rsp,    8
-      call    initStrongholdPointOfReference
-      add     rsp,    8
-
-      sub     rsp,    8
       call    validateGettingCloserToStronghold
       add     rsp,    8
 
@@ -95,7 +85,7 @@ section .text
     sub     ax,    word[rsi + 4]
 
     sub     rsp,    8
-    call    calculateModule           ; Se calcula el modulo de la diferencia
+    call    calculateModuleOfAx           ; Se calcula el modulo de la diferencia
     add     rsp,    8
 
     cmp     ax,    1
@@ -106,7 +96,7 @@ section .text
     sub     ax,    word[rsi + 6]
     
     sub     rsp,    8
-    call    calculateModule           ; Se calcula el modulo de la diferencia
+    call    calculateModuleOfAx           ; Se calcula el modulo de la diferencia
     add     rsp,    8
 
     cmp     ax,    1
@@ -121,13 +111,6 @@ section .text
       ret
 
 
-  calculateModule:
-    cmp     ax,    0
-    jl      negative
-    ret
-    negative:
-      neg     ax
-      ret
 
   validateNotMovingSideways:
 
@@ -228,94 +211,91 @@ section .text
 
 
   ; RETORNA 0 SI NO SE ESTA ACERCANDO A LA FORTALEZA
-  ; SE USA EL METODO MANHATTAN PARA CALCULAR LA DISTANCIA ENTRE DOS PUNTOS
+  ; SI EL MOVIMIENTO ES HACIA LOS "COSTADOS" VERIFICA QUE SE MUEVA HACIA EL CENTRO DEL TABLERO
+  ; SI EL MOVIMIENTO ES EN DIRECCION DE LA FORTALEZA, VERIFICA QUE EL SENTIDO SEA CORRECTO
 
   validateGettingCloserToStronghold:
     xor     rax,    rax
-    mov     word[distanceFromPieceToStronghold],    0
-    mov     word[distanceFromDestinationToStronghold],    0
+    cmp     byte[strongholdDir],    0
+    je      validateGettingCloserToStrongholdUp
+    cmp     byte[strongholdDir],    1
+    je      validateGettingCloserToStrongholdRight
+    cmp     byte[strongholdDir],    2
+    je      validateGettingCloserToStrongholdDown
+    cmp     byte[strongholdDir],    3
+    je      validateGettingCloserToStrongholdLeft
+    jmp     notGettingCloserToStronghold
 
-    ; CALCULAR DISTANCIA ENTRE FILA DE PIEZA Y PUNTO DE REFERENCIA
-    mov     ax,    word[rsi]
-    sub     ax,    word[strongholdPointOfReference]
+    validateGettingCloserToStrongholdDown:
+      ; SI LA FILA DE INICIO Y FINAL SON IGUALES SE ESTA MOVIENDO A "LOS COSTADOS"
+      mov     ax,    word[rsi]
+      cmp     ax,    word[rsi + 4]
+      je      validateGettingCloserToStrongholdDownSideWays
+      ; EN EL CASO CONTRARIO, VERIFICAR QUE LA FILA DESTINO ES MAYOR A LA FILA DE INICIO (SE ESTA ACERCANDO A LA FORTALEZA)
+      mov     ax,    word[rsi]
+      sub     ax,    word[rsi + 4]
 
-    sub     rsp,    8
-    call    calculateModule           ; Se calcula el modulo de la diferencia
-    add     rsp,    8
+      sub     rsp,    8
+      call    calculateModuleOfAx
+      add     rsp,    8
 
-    add     word[distanceFromPieceToStronghold],    ax
+      cmp     ax,    0
+      jl      notGettingCloserToStronghold
 
-    ; CALCULAR DISTANCIA ENTRE COLUMNA DE PIEZA Y PUNTO DE REFERENCIA
-    mov     ax,    word[rsi + 2]
-    sub     ax,    word[strongholdPointOfReference + 2]
+      mov     rax,    1   ; PASO LA VALIDACION
+      ret
+      validateGettingCloserToStrongholdDownSideWays:
+        mov   word[distance],    0
+        ; SE CALCULA LA DISTANCIA ENTRE LA COLUMNA DE INICIO Y EL CENTRO
+        mov   ax,    word[rsi + 2]    
+        sub   ax,    4
 
-    sub     rsp,    8
-    call    calculateModule           ; Se calcula el modulo de la diferencia
-    add     rsp,    8
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
 
-    add     word[distanceFromPieceToStronghold],    ax
+        mov   word[distance],    ax
+        ; SE CALCULA LA DISTANCIA ENTRE LA COLUMNA DE DESTINO Y EL CENTRO
+        mov   ax,    word[rsi + 6]
+        sub   ax,    4
+        
+        sub   rsp,  8
+        call  calculateModuleOfAx
+        add   rsp,  8
+        
+        cmp   ax,    word[distance]
+        jge   notGettingCloserToStronghold
 
-    ; CALCULAR DISTANCIA ENTRE FILA DE DESTINO Y PUNTO DE REFERENCIA
-    mov     ax,    word[rsi + 4]
-    sub     ax,    word[strongholdPointOfReference]
-    
-    sub     rsp,    8
-    call    calculateModule           ; Se calcula el modulo de la diferencia
-    add     rsp,    8
+        mov   rax,    1      ; PASO LA VALIDACION
+        ret
 
-    add     word[distanceFromDestinationToStronghold],    ax
-    
-    ; CALCULAR DISTANCIA ENTRE COLUMNA DE DESTINO Y PUNTO DE REFERENCIA
-    mov     ax,    word[rsi + 6]
-    sub     ax,    word[strongholdPointOfReference + 2]
-  
-    sub     rsp,    8
-    call    calculateModule           ; Se calcula el modulo de la diferencia
-    add     rsp,    8
 
-    add     word[distanceFromDestinationToStronghold],    ax
-    
-    mov     ax,    word[distanceFromPieceToStronghold]
-    cmp     ax,    word[distanceFromDestinationToStronghold]
-    jle     notGettingCloserToStronghold
-    mov     rax,    1
-    ret
-    
+    validateGettingCloserToStrongholdLeft:
+
+
+    validateGettingCloserToStrongholdUp:
+
+
+    validateGettingCloserToStrongholdRight:
+   
+
     notGettingCloserToStronghold:
       mov     qword[errorMsg],    canOnlyMoveTowardsStrongholdMsg
       mov     rax,    0
       ret
 
 
-  initStrongholdPointOfReference:
-    mov     byte[strongholdDir],    cl
-    cmp     cl,    0
-    je      strongholdIsUpInit
-    cmp     cl,    1
-    je      strongholdIsRightInit
-    cmp     cl,    2
-    je      strongholdIsDownInit
-    cmp     cl,    3
-    je      strongholdIsLeftInit
+
+
+  calculateModuleOfAx:
+    cmp     ax,    0
+    jl      negative
     ret
-
-    strongholdIsUpInit:
-      mov     word[strongholdPointOfReference],    0
-      mov     word[strongholdPointOfReference + 2],    4
+    negative:
+      neg     ax
       ret
 
-    strongholdIsRightInit:
-      mov     word[strongholdPointOfReference],    4
-      mov     word[strongholdPointOfReference + 2],    8
-      ret
-      
-    strongholdIsDownInit:
-      mov     word[strongholdPointOfReference],    8
-      mov     word[strongholdPointOfReference + 2],    4
-      ret
 
-    strongholdIsLeftInit:
-      mov     word[strongholdPointOfReference],    4
-      mov     word[strongholdPointOfReference + 2],    0
-      ret
+
+
 
