@@ -1,5 +1,5 @@
 ; RSI: Puntero con el array contador
-; DIL: Stat que se quiere recibir
+; RDI: Stat que se quiere recibir
 ; 0: Capturas, 1-8: Direcciones (Notes)
 
 section .data
@@ -10,7 +10,7 @@ section .bss
 section .text
     global getStatCount
     getStatCount:
-    add rsi, dil ; Aumenta RSI la cantidad de bytes indicada por DIL
+    add rsi, rdi ; Aumenta RSI la cantidad de bytes indicada por DIL
     lea rdi, [value] ; RDI apunta a value
     mov rcx, 1 ; Cantidad de bytes a copiar (1)
     rep movsb ; Valor en el array -> value
