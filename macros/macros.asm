@@ -1,3 +1,10 @@
+%macro command 1
+  mov rdi, cmd_clear
+  sub rsp, 8
+  call system
+  add rsp, 8
+%endmacro
+
 ;Recibe un string y lo imprime
 %macro print 1
   mov     rdi,    %1
