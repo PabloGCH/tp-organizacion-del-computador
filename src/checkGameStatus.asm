@@ -4,7 +4,6 @@ global checkGameStatus
 section .data
     bRows db 7
     bCols db 7
-    data db "Data: %hhi", 10, 0
 
 section .bss
     board resq 1
@@ -129,6 +128,85 @@ incrementOfficer:
     ret
 
 verifyDrownedOfficer:
+    mov dil, [bCountRows]
+    mov sil, [bCountCols]
+
+    dec sil
+    dec dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+    dec dil
+    inc sil
+
+    dec dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc dil
+    inc dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+    dec cl
+
+    inc sil
+    dec dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc dil
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    ret
+
+checkPosition:
+    cmp dil, 0
+    jl noMove
+    cmp dil, [bRows]
+    jg noMove
+    cmp sil, 0
+    jl noMove
+    cmp sil, [bCols]
+    jg noMove
+
+    mov r8, [board]
+    xor r9,r9
+    mov dl, [bCols]
+    mov r9b, dil
+    imul r9, rdx
+
+    add r9b, sil
+    mov dl, [r8 + r9]
+    cmp dl, 0
+    je movementFound
+
+    ret
+
+noMove:
+    ret
+
+movementFound:
+    mov byte [drownedOfficers], 0
     ret
 
 soldiersWin:
