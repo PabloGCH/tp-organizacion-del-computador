@@ -133,7 +133,6 @@ incrementOfficer:
     ret
 
 verifyDrownedOfficer:
-    print newLine
     mov dil, [bCountRows]
     mov sil, [bCountCols]
     mov byte [cRow], dil
