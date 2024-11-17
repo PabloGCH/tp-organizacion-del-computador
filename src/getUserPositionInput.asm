@@ -5,6 +5,9 @@ extern validatePieceInput
 extern validateDestinationInput
 extern movementIsPossible
 
+extern strcmp
+extern quit
+
 %include "macros.asm"
 
 section .data
@@ -12,6 +15,8 @@ section .data
   msgDestination               db     "Ingrese la fila y columna de destino (Separado por espacios): ", 0
   mgsInvalidPosition           db     "Posicion invalida, intente de nuevo", 10, 0
   formatInput                  db     "%d %d", 0
+  quitStr                      db     "Quit", 0
+  quitLowerStr                 db     "quit", 0
 
   pieceRow                     dw     0
   pieceColumn                  dw     0
@@ -33,11 +38,11 @@ section .bss
 section .text
   ;PRE-COND:  LA SUBRUTINA RECIBE
   ;           EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO
-  ;           EN RSI UN NUMERO QUE INDICA TIPO DE JUGADOR           
+  ;           EN RSI UN NUMERO QUE INDICA TIPO DE JUGADOR
   ;           EN RDX LA DIRECCION DE LA FORTALEZA
-              
+
   ;POST-COND: LA SUBRUTINA DEVUELVE UNA DIRECCION DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS
-  ;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO          
+  ;           QUE CONTIENE LA FILA Y COLUMNA DE LA PIEZA Y LA FILA Y COLUMNA DE DESTINO
   ;           EN ESE ORDEN. CADA ELEMENTO ES UN WORD (2 BYTES)
   ;TESTEAR:   PROBAR CON EL COMANDO "p/d *((short *) $rax)@4" DESDE GDB ANTES DE QUE TERMINE EL PROGRAMA
   ;           DEBERIA MOSTRAR LOS VALORES INGRESADOS POR EL USUARIO
@@ -45,8 +50,8 @@ section .text
     mov    qword[board],    rdi
     mov    byte[playerType], sil
     mov    byte[strongholdDir], dl
-    
-    
+
+
     getPiecePosition:
       ; SE INICIALIZAN LA POSICION CON UN VALOR INVALIDO PARA QUE NO USE VALORES VIEJOS
       ; EN FUTURAS INVOCACIONES DE LA SUBRUTINA
@@ -62,11 +67,15 @@ section .text
       add     rsp,    8
 
       mov     rdi,    inputText
+      sub     rsp,    8
+      call    validateQuit
+      add     rsp,    8
+
+      mov     rdi,    inputText
       mov     rsi,    formatInput
 
       mov     rdx,    pieceRow
       mov     rcx,    pieceColumn
-      
 
       sub     rsp,    8
       call    sscanf
@@ -109,11 +118,16 @@ section .text
       print msgDestination
 
       mov     rdi,    inputText
-      
+
       sub     rsp,    8
       call    gets
       add     rsp,    8
-    
+
+      mov     rdi,    inputText
+      sub     rsp,    8
+      call    validateQuit
+      add     rsp,    8
+
       mov     rdi,    inputText
       mov     rsi,    formatInput
 
@@ -152,7 +166,7 @@ section .text
         cmp     rax,    0
         je      getPiecePosition
 
-    
+
     saveInputResults:
       mov     ax,    word[pieceRow]
       mov     word[positions],        ax
@@ -162,7 +176,7 @@ section .text
       mov     word[positions + 4],    ax
       mov     ax,    word[destinationColumn]
       mov     word[positions + 6],    ax
-    
+
     validateIfMovementIsPossible:
       mov     rdi,    qword[board]
       mov     rsi,    positions
@@ -175,8 +189,26 @@ section .text
 
       cmp     rax,    0
       je      getPiecePosition
-    
-    
+
     mov     rax,    positions
     ret
 
+validateQuit:
+    mov     rsi,    quitStr
+    call    strcmp
+    cmp     rax,    0
+    jz      quit
+
+    mov     rdi,    inputText
+    mov     rsi,    quitLowerStr
+    call    strcmp
+    cmp     rax,    0
+    jz      quit
+
+    ret
+
+quitGame:
+    sub    rsp,    8
+    call   quit
+    add    rsp,    8
+    ret
