@@ -17,6 +17,8 @@ section .bss
     officersCount resb 1
     drownedOfficers resb 1
     stronghold resb 1
+    cRow resb 1
+    cCol resb 1
 
 section .text
 
@@ -56,6 +58,9 @@ doneLoopRows:
     cmp byte [officersCount], 0
     je soldiersWin
     cmp byte [soldiersInStrongholdCount], 9
+    je soldiersWin
+
+    cmp byte [drownedOfficers], 1
     je soldiersWin
 
     jmp gameContinue
@@ -128,51 +133,71 @@ incrementOfficer:
     ret
 
 verifyDrownedOfficer:
+    print newLine
     mov dil, [bCountRows]
     mov sil, [bCountCols]
+    mov byte [cRow], dil
+    mov byte [cCol], sil
 
-    dec sil
-    dec dil
+    dec byte[cRow]
+    dec byte[cCol]
+
+    mov dil, [cRow]
+    mov sil, [cCol]
     sub rsp, 8
     call checkPosition
     add rsp, 8
 
-    inc sil
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
     sub rsp, 8
     call checkPosition
     add rsp, 8
 
-    inc sil
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
     sub rsp, 8
     call checkPosition
     add rsp, 8
-    inc dil
-    dec sil
+    inc byte[cRow]
+    dec byte[cCol]
 
-    dec sil
-    sub rsp, 8
-    call checkPosition
-    add rsp, 8
-
-    inc sil
-    inc sil
-    sub rsp, 8
-    call checkPosition
-    add rsp, 8
-    dec cl
-
-    dec sil
-    inc dil
+    dec byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
     sub rsp, 8
     call checkPosition
     add rsp, 8
 
-    inc sil
+    inc byte[cCol]
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+    dec byte[cCol]
+
+    dec byte[cCol]
+    inc byte[cRow]
+    mov dil, [cRow]
+    mov sil, [cCol]
     sub rsp, 8
     call checkPosition
     add rsp, 8
 
-    inc sil
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
     sub rsp, 8
     call checkPosition
     add rsp, 8
@@ -180,6 +205,9 @@ verifyDrownedOfficer:
     ret
 
 checkPosition:
+    mov byte [cRow], dil
+    mov byte [cCol], sil
+
     cmp dil, 0
     jl noMove
     cmp dil, [bRows]
@@ -197,6 +225,8 @@ checkPosition:
 
     add r9b, sil
     mov dl, [r8 + r9]
+    mov byte [currentNumber], dl
+
     cmp dl, 0
     je movementFound
 
