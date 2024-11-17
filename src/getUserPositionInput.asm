@@ -197,13 +197,13 @@ validateQuit:
     mov     rsi,    quitStr
     call    strcmp
     cmp     rax,    0
-    jz      quit
+    jz      quitGame
 
     mov     rdi,    inputText
     mov     rsi,    quitLowerStr
     call    strcmp
     cmp     rax,    0
-    jz      quit
+    jz      quitGame
 
     ret
 

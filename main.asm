@@ -2,7 +2,7 @@ global main
 %include "macros.asm"
 
 ; FUNCIONES EXTERNAS
-extern system 
+extern system
 
 ; SUBRUTINAS
 extern getUserPositionInput
@@ -10,6 +10,8 @@ extern printBoard
 extern printCurrentTurn
 extern movePiece
 extern checkGameStatus
+
+extern printQuitMessage
 
 section .data
   cmd_clear             db      "clear", 0
@@ -34,6 +36,10 @@ section .text
     mainGameLoop:
       command cmd_clear
       ; TURNO DE SOLDADOS
+
+      sub rsp, 8
+      call printQuitMessage
+      add rsp, 8
 
       mov rdi, 0
       sub rsp, 8
