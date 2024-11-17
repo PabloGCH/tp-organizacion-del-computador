@@ -1,27 +1,32 @@
-; RDI: Posicion deseada
+; DIL: Posicion deseada
 ; SIL: Cantidad a modificar
-; 0: Capturas, 1-8: Direcciones (Notes)
+; DL : Oficial a modificar. (0, 1)
+; 0-8 Primer Oficial | 9-17 Segundo oficial
+; 0/9 Capturas. 2-8/10-17 Direcciones 
 
 section .data
-        statcounter times 9 db 0
+        statcounter times 18 db 0
 section .bss
         value resb 1
 section .text
 
     global statCounterGet
-    ; Mueve a AL el valor del array en la posicion RDI
+    ; Mueve a AL el valor del array en la posicion dil
     statCounterGet:
-        mov al, [statCounter + rdi] ; Mueve el contenido deseado a AL
+        mul dl, 9
+        mov al, [statCounter + dil + dl] ; Mueve el contenido deseado a AL
         ret
 
     global statCounterAdd
-    ; Le agrega al contenido del array en la posicion RDI el contenido de SIL 
+    ; Le agrega al contenido del array en la posicion dil el contenido de SIL 
     statCounterAdd:
-        add byte[statCounter + rdi], sil ; Le suma al contenido de RSI (Debería ser el elemento del array) DL
+        mul dl, 9
+        add byte[statCounter + dil + dl], sil ; Le suma al contenido de RSI (Debería ser el elemento del array) DL
         ret
 
     global statCounterSet
-    ; Reemplaza al contenido del array en la posicion RDI por el contenido de SIL
+    ; Reemplaza al contenido del array en la posicion dil por el contenido de SIL
     statCounterSet:
-        mov byte[statcounter + rdi], sil ; Le cambia al contenido deseado al contenido de DL
+        mul dl, 9
+        mov byte[statcounter + dil + dl], sil ; Le cambia al contenido deseado al contenido de DL
         ret
