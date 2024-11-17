@@ -16,6 +16,7 @@ section .data
   noPathToDestinationMsg                    db    "No hay un camino para llegar a la casilla de destino", 10, 0
   obstackesInTheWayMsg                      db    "Hay obstaculos en el camino", 10, 0
   unexpectedErrorMsg                        db    "Error inesperado", 10, 0
+  cellAfterSoldierMustBeEmptyMsg            db    "La casilla despues del soldado debe estar vacia", 10, 0
   direction                                 db    0     
 
 
@@ -101,7 +102,24 @@ section .text
       
       ; DEBERIA SER IMPOSIBLE LLEGAR A ESTE PUNTO PERO SE MANEJA POR SI ACASO
       jmp  unexpectedError
+
+    
+    checkPositionNextToSoldier:
+      sub  rsp,  8
+      call  incrementPosition
+      add  rsp,  8
       
+      mov  rdi,  nextPosition
+    
+      sub  rsp,  8
+      call  getBoardItem
+      add  rsp,  8
+      
+      cmp  al,  0
+      je  valid
+
+      mov    errorMsg,    cellAfterSoldierMustBeEmptyMsg
+      jmp    invalid
     
     obstaclesInTheWay:
       mov    errorMsg,    obstackesInTheWayMsg
