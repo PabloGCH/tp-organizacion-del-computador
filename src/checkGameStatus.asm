@@ -1,6 +1,5 @@
 global checkGameStatus
-%include "macros.asm"
-
+extern checkOfficerCanCapture
 section .data
     bRows db 7
     bCols db 7
@@ -127,14 +126,15 @@ skipStrongholdCount:
 
 incrementOfficer:
     inc byte [officersCount]
+
+    mov dil, [bCountRows]
+    mov sil, [bCountCols]
     sub rsp, 8
     call verifyDrownedOfficer
     add rsp, 8
     ret
 
 verifyDrownedOfficer:
-    mov dil, [bCountRows]
-    mov sil, [bCountCols]
     mov byte [cRow], dil
     mov byte [cCol], sil
 
@@ -200,6 +200,15 @@ verifyDrownedOfficer:
     sub rsp, 8
     call checkPosition
     add rsp, 8
+
+    mov rdi, [board]
+    mov sil, [bCountRows]
+    mov dl, [bCountCols]
+    sub rsp, 8
+    call checkOfficerCanCapture
+    add rsp, 8
+    cmp al, 1
+    je movementFound
 
     ret
 

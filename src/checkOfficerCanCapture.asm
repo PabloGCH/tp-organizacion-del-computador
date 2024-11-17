@@ -1,17 +1,13 @@
 global checkOfficerCanCapture
-%include "macros.asm"
 section .data
     bCols db 7
     bRows db 7
-    data db "Data: %hhi", 10, 0
-    dataCell db "DataCell: %hhi", 10, 0
     newLine db 10, 0
 section .bss
     board resq 1
     cRow resb 1
     cCol resb 1
     captureFound resb 1
-    dataAux resb 1
 
 section .text
 checkOfficerCanCapture:
@@ -241,7 +237,6 @@ isPositionAvailable:
 
     add r9b, sil
     mov dl, [r8 + r9]
-    mov byte [dataAux], dl
 
     cmp dl, 0
     je positionAvailable
