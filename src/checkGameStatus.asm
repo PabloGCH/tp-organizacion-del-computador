@@ -1,10 +1,8 @@
 global checkGameStatus
-%include "macros.asm"
-
+extern checkOfficerCanCapture
 section .data
     bRows db 7
     bCols db 7
-    data db "Data: %hhi", 10, 0
 
 section .bss
     board resq 1
@@ -18,6 +16,8 @@ section .bss
     officersCount resb 1
     drownedOfficers resb 1
     stronghold resb 1
+    cRow resb 1
+    cCol resb 1
 
 section .text
 
@@ -57,6 +57,9 @@ doneLoopRows:
     cmp byte [officersCount], 0
     je soldiersWin
     cmp byte [soldiersInStrongholdCount], 9
+    je soldiersWin
+
+    cmp byte [drownedOfficers], 1
     je soldiersWin
 
     jmp gameContinue
@@ -123,12 +126,125 @@ skipStrongholdCount:
 
 incrementOfficer:
     inc byte [officersCount]
+
+    mov dil, [bCountRows]
+    mov sil, [bCountCols]
     sub rsp, 8
     call verifyDrownedOfficer
     add rsp, 8
     ret
 
 verifyDrownedOfficer:
+    mov byte [cRow], dil
+    mov byte [cCol], sil
+
+    dec byte[cRow]
+    dec byte[cCol]
+
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+    inc byte[cRow]
+    dec byte[cCol]
+
+    dec byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc byte[cCol]
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+    dec byte[cCol]
+
+    dec byte[cCol]
+    inc byte[cRow]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    inc byte[cCol]
+    mov dil, [cRow]
+    mov sil, [cCol]
+    sub rsp, 8
+    call checkPosition
+    add rsp, 8
+
+    mov rdi, [board]
+    mov sil, [bCountRows]
+    mov dl, [bCountCols]
+    sub rsp, 8
+    call checkOfficerCanCapture
+    add rsp, 8
+    cmp al, 1
+    je movementFound
+
+    ret
+
+checkPosition:
+    mov byte [cRow], dil
+    mov byte [cCol], sil
+
+    cmp dil, 0
+    jl noMove
+    cmp dil, [bRows]
+    jg noMove
+    cmp sil, 0
+    jl noMove
+    cmp sil, [bCols]
+    jg noMove
+
+    mov r8, [board]
+    xor r9,r9
+    mov dl, [bCols]
+    mov r9b, dil
+    imul r9, rdx
+
+    add r9b, sil
+    mov dl, [r8 + r9]
+    mov byte [currentNumber], dl
+
+    cmp dl, 0
+    je movementFound
+
+    ret
+
+noMove:
+    ret
+
+movementFound:
+    mov byte [drownedOfficers], 0
     ret
 
 soldiersWin:
