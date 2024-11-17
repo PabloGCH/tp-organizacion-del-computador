@@ -3,14 +3,12 @@ global main
 
 ; FUNCIONES EXTERNAS
 extern system
-
 ; SUBRUTINAS
 extern getUserPositionInput
 extern printBoard
 extern printCurrentTurn
 extern movePiece
 extern checkGameStatus
-
 extern printQuitMessage
 
 section .data
@@ -27,6 +25,7 @@ section .data
   strongholdDir         db       2                  ; 0 = Up, 1 = Right, 2 = Down, 3 = Left
 
   characters            db      'XO ', 0
+  shift                 db       0 ; 0 = Soldiers, 1 = Officers
 
 section .bss
   gameStatus resb 1
@@ -35,13 +34,12 @@ section .text
   main:
     mainGameLoop:
       command cmd_clear
-      ; TURNO DE SOLDADOS
 
       sub rsp, 8
       call printQuitMessage
       add rsp, 8
 
-      mov rdi, 0
+      mov rdi, [shift]
       sub rsp, 8
       call printCurrentTurn
       add rsp, 8
@@ -49,40 +47,26 @@ section .text
       mov rdi, board
       mov esi, [stronghold]
       mov edx, [characters]
-
       sub rsp, 8
       call printBoard
       add rsp, 8
 
       mov rdi, board
-      mov esi, [stronghold]
-      sub rsp, 8
-      call checkGameStatus
-      add rsp, 8
-
-      mov [gameStatus], al
-
-      mov rdi, board
-      mov rsi, 0
+      mov rsi, [shift]
       mov dl, byte[strongholdDir]
-
       sub     rsp,    8
       call    getUserPositionInput
       add     rsp,    8
-      
-      mov rdi, board
+
       mov rsi, rax
+      mov rdi, board
       mov dl, byte[strongholdDir]
-      
       sub     rsp,    8
       call    movePiece
       add     rsp,    8
 
-      command cmd_clear
-
       mov rdi, board
       mov esi, [stronghold]
-
       sub rsp, 8
       call checkGameStatus
       add rsp, 8
@@ -92,51 +76,19 @@ section .text
       cmp byte [gameStatus], -1
       jne gameOver
 
-      ; TURNO DE OFICIALES
-
-      mov rdi, 1
       sub rsp, 8
-      call printCurrentTurn
+      call setShift
       add rsp, 8
 
-      mov rdi, board
-      mov esi, [stronghold]
-      mov edx, [characters]
-
-      sub rsp, 8
-      call printBoard
-      add rsp, 8
-
-      mov rdi, board
-      mov rsi, 1
-      mov dl, byte[strongholdDir]
-
-      sub     rsp,    8
-      call getUserPositionInput
-      add     rsp,    8
-
-      sub     rsp,    8
-      call    movePiece
-      add     rsp,    8
-
-
-      sub rsp, 8
-      call checkGameStatus
-      add rsp, 8
-
-      mov rdi, board
-      mov esi, [stronghold]
-      sub rsp, 8
-      call checkGameStatus
-      add rsp, 8
-
-      mov [gameStatus], al
-
-      cmp byte [gameStatus], -1
-      je mainGameLoop
+      jmp mainGameLoop
   gameOver:
     ret
 
+setShift:
+    mov al, [shift]
+    xor al, 1
+    mov [shift], al
+    ret
 
 ;TEST DE PRINT STATS
 ;=================

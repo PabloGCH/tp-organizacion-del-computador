@@ -226,7 +226,8 @@ checkPosition:
     jg noMove
 
     mov r8, [board]
-    xor r9,r9
+    xor r9, r9
+    mov rdx, 0
     mov dl, [bCols]
     mov r9b, dil
     imul r9, rdx
