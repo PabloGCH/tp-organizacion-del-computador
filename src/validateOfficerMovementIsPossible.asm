@@ -230,10 +230,10 @@ section .text
     je      incrementUpLeft
     ret
     incrementUp:
-      inc     word[nextPosition]
+      dec     word[nextPosition]
       ret
     incrementUpRight:
-      inc     word[nextPosition]
+      dec     word[nextPosition]
       inc     word[nextPosition + 2]
       ret
     incrementRight:
