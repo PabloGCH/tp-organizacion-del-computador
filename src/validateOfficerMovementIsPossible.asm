@@ -1,6 +1,7 @@
 global validateOfficerMovementIsPossible
 extern getBoardItem
 extern returnDirection
+extern removePiece
 
 %include "macros.asm"
 
@@ -17,10 +18,12 @@ section .data
 section .bss
   board                                     resq  1
 
-  startPosition                                     times 2   resw   1
-  endPosition                                       times 2   resw   1
+  startPosition                             times 2   resw   1
+  endPosition                               times 2   resw   1
 
   nextPosition                              times 2   resw   1
+
+  previousPosition                          times 2   resw   1
 
   positions                                 times 4   resb   1    ; Solo se usa para "returnDirection"
 
@@ -30,7 +33,9 @@ section .text
   ; PRE-COND:  LA SUBRUTINA RECIBE
   ;     RECIBE EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO (Cada elemento es un byte)
   ;     RECIBE EN RSI LA DIRECCIÓN DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS (DE 2 BYTES CADA UNO) (Fila de pieza, columna de pieza, fila de destino, columna de destino)
-  ; POST-COND: RETORNA 0 SI EL MOVIMIENTO NO ES POSIBLE
+  ; POST-COND:
+  ;   - RETORNA 0 SI EL MOVIMIENTO NO ES POSIBLE
+  ;   - RETORNA 1 SI EL MOVIMIENTO ES POSIBLE
   validateOfficerMovementIsPossible:
 
     init:
@@ -158,6 +163,9 @@ section .text
 
     
     checkPositionNextToSoldier:
+      mov  eax, dword[nextPosition]
+      mov  dword[previousPosition], eax
+
       sub  rsp,  8
       call  incrementPosition
       add  rsp,  8
@@ -178,10 +186,32 @@ section .text
       positionAfterSoldierMustBeDestination:
         mov  eax,  dword[nextPosition]
         cmp  eax,  dword[endPosition]
-        je  valid
+        je   captureSoldier
 
         mov    qword[errorMsg],  positionAfterSoldierMustBeDestinationMsg
         jmp    invalid
+
+        
+        captureSoldier:
+          ; SE CONSIGUE LA PIEZA DEL OFICIAL QUE REALIZO LA CAPTURA
+          mov  rdi,  qword[board]
+          mov  rsi,  startPosition
+
+          sub  rsp,  8
+          call  getBoardItem
+          add  rsp,  8
+          
+          ; TODO: EN RAX QUEDA EL NUMERO DEL OFICIAl (2 o 3) AQUI HABRIA QUE AGREGAR EL INCREMENTO DEL CONTADOR DE PIEZAS CAPTURADAS
+          ;       DE ESE OFICIAL
+
+          mov  rdi,  qword[board]
+          mov  rsi,  previousPosition
+
+          sub  rsp,  8
+          call removePiece
+          add  rsp,  8
+          
+          jmp   valid
         
     
     obstaclesInTheWay:
