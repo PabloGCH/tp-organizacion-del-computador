@@ -11,6 +11,8 @@ extern movePiece
 extern checkGameStatus
 extern printQuitMessage
 
+extern quit
+
 section .data
   cmd_clear             db      "clear", 0
   board                 db      -1, -1,  1,  1,  1, -1, -1, \

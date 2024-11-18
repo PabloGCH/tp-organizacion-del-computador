@@ -2,13 +2,13 @@ global quit
 global printQuitMessage
 extern printf
 section .data
-    sys_exit db 60
     msgQuit db 27,'[90mIngrese "Quit" para salir',27,"[0m", 10, 0
 section .text
 quit:
     mov rdi, 0
-    mov rax, [sys_exit]
+    mov rax, 60 ; sys_exit
     syscall
+    ret
 
 printQuitMessage:
     mov rdi, msgQuit
