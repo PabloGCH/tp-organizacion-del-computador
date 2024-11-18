@@ -60,7 +60,7 @@ section .text
     ret
 
   invalid:
-    print   qword[errorMsg]
+    print   errorMsg
     mov     rax,    0
     ret
 

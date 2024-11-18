@@ -1,9 +1,7 @@
 global getBoardItem
 
-section .data
+section .bss
   board resq 1
-  position resq 1
-
 
 ; PRE-COND:
 ;     RECIBE EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO (Cada elemento es un byte)
@@ -13,8 +11,7 @@ section .data
 
 section .text
   getBoardItem:
-    mov rdi, [board]
-    mov rsi, [position]
+    mov qword[board], rdi
 
     mov     ax,     word[rsi]
     sub     ax,     1
@@ -33,6 +30,11 @@ section .text
     mov     al,     byte[rdx]
 
     ret
+
+
+
+
+
 
 
 

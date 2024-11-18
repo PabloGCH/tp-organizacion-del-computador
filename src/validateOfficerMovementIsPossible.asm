@@ -1,23 +1,28 @@
 global validateOfficerMovementIsPossible
+extern getBoardItem
 extern returnDirection
+
+%include "macros.asm"
 
 
 section .data
-  board                                     resq  1
-
-  start                                     times 2   resw   1
-  end                                       times 2   resw   1
-
-  nextPosition                              times 2   resw   1
-
-  positions                                 times 4   resb   1    ; Solo se usa para "returnDirection"
-
   errorMsg                                  dq    0
   noPathToDestinationMsg                    db    "No hay un camino para llegar a la casilla de destino", 10, 0
   obstackesInTheWayMsg                      db    "Hay obstaculos en el camino", 10, 0
   unexpectedErrorMsg                        db    "Error inesperado", 10, 0
   cellAfterSoldierMustBeEmptyMsg            db    "La casilla despues del soldado debe estar vacia", 10, 0
   direction                                 db    0     
+
+section .bss
+  board                                     resq  1
+
+  startPosition                                     times 2   resw   1
+  endPosition                                       times 2   resw   1
+
+  nextPosition                              times 2   resw   1
+
+  positions                                 times 4   resb   1    ; Solo se usa para "returnDirection"
+
 
 
 section .text
@@ -28,13 +33,25 @@ section .text
   validateOfficerMovementIsPossible:
 
     init:
-      mov  word[board],  rdi
-      mov  word[start],  word[rsi]
-      mov  word[start + 2],  word[rsi + 2]
-      mov  word[end],  word[rsi + 4]
-      mov  word[end + 2],  word[rsi + 6]
-      mov  word[nextPosition],  word[start]
-      mov  word[nextPosition + 2],  word[start + 2]
+      mov  qword[board],  rdi
+
+      mov  ax,  word[rsi]
+      mov  word[startPosition],  ax
+  
+      mov  ax,  word[rsi + 2]
+      mov  word[startPosition + 2],  ax
+
+      mov  ax,  word[rsi + 4]
+      mov  word[endPosition],  ax
+
+      mov  ax,  word[rsi + 6]
+      mov  word[endPosition + 2],  ax
+
+      mov  ax,  word[startPosition]
+      mov  word[nextPosition],  ax
+
+      mov  ax,  word[startPosition + 2]
+      mov  word[nextPosition + 2],  ax
 
     convertPositions:
       ; TRANSFORMA LAS POSICIONES QUE SE RECIBEN AL FORMATO REQUERIDO POR "returnDirection"
@@ -48,10 +65,10 @@ section .text
       mov  byte[positions + 3],  al
 
     getDirection:
-      mov  dil,  byte[positions]
-      mov  sil,  byte[positions + 1]
-      mov  dh,  byte[positions + 2]
-      mov  dl,  byte[positions + 3]
+      mov  dil,  byte[positions + 1]    ; Columna (x)
+      mov  sil,  byte[positions]         ; Fila (y)
+      mov  dh,  byte[positions + 3]      ; Columna (x)
+      mov  dl,  byte[positions + 2]      ; Fila (y)
 
       sub  rsp,  8
       call  returnDirection
@@ -67,16 +84,16 @@ section .text
       ; Si no se encuentra ninguno es valido. Si se encuentra uno y la posicion siguiente no es el destino, es invalido. Si se encuentra uno y la posicion siguiente es el destino, es valido.
       ; No se verifica si esta fuera o no porque ya hay una validación previa que lo hace
 
-      mov  eax,  dword[nextPosition]
-      cmp  eax,  dword[end]
-      je  valid                         ; SI LLEGO AL DESTINO ES VALIDO
-      
       sub  rsp,  8
       call  incrementPosition
       add  rsp,  8
 
-      mov  rdi,  word[board]
-      mov  rsi,  word[nextPosition]
+      mov  eax,  dword[nextPosition]
+      cmp  eax,  dword[endPosition]
+      je  valid                         ; SI LLEGO AL DESTINO ES VALIDO
+
+      mov  rdi,  qword[board]
+      mov  rsi,  nextPosition
 
       sub  rsp,  8
       call  getBoardItem
@@ -109,7 +126,8 @@ section .text
       call  incrementPosition
       add  rsp,  8
       
-      mov  rdi,  nextPosition
+      mov  rdi,  qword[board]
+      mov  rsi,  nextPosition
     
       sub  rsp,  8
       call  getBoardItem
@@ -117,20 +135,20 @@ section .text
       
       cmp  al,  0
       je  valid
-
-      mov    errorMsg,    cellAfterSoldierMustBeEmptyMsg
+    
+      mov    qword[errorMsg],    cellAfterSoldierMustBeEmptyMsg
       jmp    invalid
     
     obstaclesInTheWay:
-      mov    errorMsg,    obstackesInTheWayMsg
+      mov    qword[errorMsg],    obstackesInTheWayMsg
       jmp    invalid
 
-    noPathToDestinationMsg:
-      mov    errorMsg,    noPathToDestinationMsg
+    noPathToDestination:
+      mov    qword[errorMsg],    noPathToDestinationMsg
       jmp    invalid
 
     unexpectedError:
-      mov    errorMsg,    unexpectedErrorMsg
+      mov    qword[errorMsg],    unexpectedErrorMsg
       jmp    invalid
 
     valid:
@@ -166,28 +184,28 @@ section .text
       ret
     incrementUpRight:
       inc     word[nextPosition]
-      inc     word[nextPosition + 1]
+      inc     word[nextPosition + 2]
       ret
     incrementRight:
-      inc     word[nextPosition + 1]
+      inc     word[nextPosition + 2]
       ret
     incrementDownRight:
       inc     word[nextPosition]
-      inc     word[nextPosition + 1]
+      inc     word[nextPosition + 2]
       ret
     incrementDown:
       inc     word[nextPosition]
       ret
     incrementDownLeft:
       inc     word[nextPosition]
-      dec     word[nextPosition + 1]
+      dec     word[nextPosition + 2]
       ret
     incrementLeft:
-      dec     word[nextPosition + 1]
+      dec     word[nextPosition + 2]
       ret
     incrementUpLeft:
       dec     word[nextPosition]
-      dec     word[nextPosition + 1]
+      dec     word[nextPosition + 2]
       ret
 
   calculateModuleOfAx:
@@ -197,20 +215,4 @@ section .text
     negative:
       neg     ax
       ret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
