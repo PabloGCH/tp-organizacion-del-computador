@@ -8,7 +8,7 @@ extern returnDirection
 section .data
   errorMsg                                  dq    0
   noPathToDestinationMsg                    db    "No hay un camino para llegar a la casilla de destino", 10, 0
-  obstackesInTheWayMsg                      db    "Hay obstaculos en el camino", 10, 0
+  obstaclesInTheWayMsg                      db    "Hay obstaculos en el camino", 10, 0
   unexpectedErrorMsg                        db    "Error inesperado", 10, 0
   cellAfterSoldierMustBeEmptyMsg            db    "La casilla despues del soldado debe estar vacia", 10, 0
   direction                                 db    0     
@@ -140,7 +140,7 @@ section .text
       jmp    invalid
     
     obstaclesInTheWay:
-      mov    qword[errorMsg],    obstackesInTheWayMsg
+      mov    qword[errorMsg],    obstaclesInTheWayMsg
       jmp    invalid
 
     noPathToDestination:
@@ -156,8 +156,12 @@ section .text
       ret
 
     invalid:   
-      print  errorMsg
-      mov    rax,    0
+      xor     rdi,    rdi
+      xor     rsi,    rsi
+      xor     rdx,    rdx
+      
+      print   qword[errorMsg]
+      mov     rax,    0
       ret
 
   ; INCREMENTA "nextPosition" SEGÚN EL MOVIMIENTO RECIBIDO

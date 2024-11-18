@@ -14,18 +14,18 @@ extern printQuitMessage
 section .data
   cmd_clear             db      "clear", 0
   board                 db      -1, -1,  1,  1,  1, -1, -1, \
-                                -1, -1,  1,  1,  1, -1, -1, \
-                                 1,  1,  1,  1,  1,  1,  1, \
-                                 1,  1,  1,  1,  1,  1,  1, \
-                                 1,  1,  0,  0,  0,  1,  1, \
-                                -1, -1,  0,  0,  3, -1, -1, \
-                                -1, -1,  2,  0,  0, -1, -1
+                                -1, -1,  0,  0,  0, -1, -1, \
+                                 1,  1,  0,  3,  0,  1,  1, \
+                                 1,  1,  0,  1,  0,  1,  1, \
+                                 1,  1,  0,  1,  0,  1,  1, \
+                                -1, -1,  0,  0,  0, -1, -1, \
+                                -1, -1,  2,  1,  1, -1, -1
 
   stronghold            db       2,  4,  4,  6
   strongholdDir         db       2                  ; 0 = Up, 1 = Right, 2 = Down, 3 = Left
 
   characters            db      'XO ', 0
-  shift                 db       0 ; 0 = Soldiers, 1 = Officers
+  shift                 db       1 ; 0 = Soldiers, 1 = Officers
 
 section .bss
   gameStatus resb 1
