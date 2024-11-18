@@ -76,6 +76,9 @@ section .text
 
         cmp     rax,    0
         je      receiveInput
+        cmp     rax,    2
+        je      checkIfGameContinues
+        
 
       
       handleMovement:

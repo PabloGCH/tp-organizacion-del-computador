@@ -131,7 +131,7 @@ section .text
 
       mov  eax,  dword[nextPosition]
       cmp  eax,  dword[endPosition]
-      je  valid                         ; SI LLEGO AL DESTINO ES VALIDO
+      je   validMovementWithoutCapture
 
       mov  rdi,  qword[board]
       mov  rsi,  nextPosition
@@ -160,7 +160,96 @@ section .text
       
       ; DEBERIA SER IMPOSIBLE LLEGAR A ESTE PUNTO PERO SE MANEJA POR SI ACASO
       jmp  unexpectedError
+  
+    
+    validMovementWithoutCapture:
+      ; SE VERIFICA QUE NO HUBIERAN CAPTURAS POSIBLES AL REALIZAR EL MOVIMIENTO
+      mov byte[direction], 1
+      mov eax,                    dword[startPosition]
+      mov dword[nextPosition],    eax
 
+      checkForCapture:
+
+        sub rsp, 8
+        call incrementPosition
+        add rsp, 8
+
+        sub rsp, 8
+        call nextPositionOutOfBounds
+        add rsp, 8
+
+        cmp rax, 1                    ; SI LA POSICION ESTA FUERA DEL TABLERO SE PRUEBA CON LA SIGUIENTE DIRECCIÓN
+        je checkNextDirection
+        
+
+        mov rdi, qword[board]
+        mov rsi, nextPosition
+        
+        sub rsp, 8
+        call getBoardItem
+        add rsp, 8
+
+        cmp al, 2                     ; SI HAY UN OFICIAL EN EL CAMINO SALTEAR A LA SIGUIENTE DIRECCIÓN
+        je  checkNextDirection
+        cmp al, 3                     ; IDEM DE COMENTARIO ANTERIOR
+        je  checkNextDirection
+        cmp al, -1                    ; SI LA CELDA NO EXISTE SALTEAR A LA SIGUIENTE DIRECCIÓN
+        je  checkNextDirection
+        cmp al, 1                     ; SI HAY UN SOLDADO EN EL CAMINO SE REVISA SI SE PUEDE CAPTURAR
+        je  verifyCaptureOfSoldierOnPath
+
+        jmp checkForCapture           ; SI NO HAY NADA EN EL CAMINO SE REPITE EL LOOP PARA REVISAR LA SIGUIENTE CELDA
+
+
+        verifyCaptureOfSoldierOnPath:
+          ; SI HAY UNA CELDA VACIA DESPUES DEL SOLDADO, EL OFICIAL MUERE PORQUE HABIA UNA CAPTURA POSIBLE
+          sub   rsp, 8
+          call  incrementPosition
+          add   rsp, 8
+    
+          sub   rsp, 8
+          call  nextPositionOutOfBounds
+          add   rsp, 8
+        
+          cmp   rax, 1
+          je    checkNextDirection      ; SI DESPUES DEL SOLDADO NO HAY MÁS CELDAS SE PRUEBA CON LA SIGUIENTE DIRECCIÓN
+
+          mov   rdi, qword[board]
+          mov   rsi, nextPosition
+          
+          sub   rsp, 8
+          call  getBoardItem
+          add   rsp, 8
+
+          cmp   al, 0
+          je    officerDiesByMissedCapture
+          jmp   checkNextDirection
+          
+          
+        checkNextDirection:
+          ; SE PRUEBA CON LA SIGUIENTE DIRECCIÓN Y SE RESETEA LA SIGUIENTE POSICION
+          ; SI NO QUEDAN DIRECCIÓNES POR PROBAR, EL OFICIAL NO MUERE
+          inc byte[direction]
+          mov eax, dword[startPosition]
+          mov dword[nextPosition], eax
+          cmp byte[direction], 9
+          je officerDoesNotDie
+          jmp checkForCapture
+
+        officerDiesByMissedCapture:
+          mov rdi, qword[board]
+          mov rsi, startPosition
+
+          sub rsp, 8
+          call removePiece
+          add rsp, 8
+
+          mov rax, 2
+          ret
+
+        officerDoesNotDie:
+          mov rax, 1
+          ret
     
     checkPositionNextToSoldier:
       mov  eax, dword[nextPosition]
@@ -234,6 +323,29 @@ section .text
       print   qword[errorMsg]
       mov     rax,    0
       ret
+
+
+
+
+
+  nextPositionOutOfBounds:
+    ; SI LA POSICION ESTA FUERA DEL TABLERO SE PRUEBA CON LA SIGUIENTE DIRECCIÓN
+    cmp word[nextPosition], 0
+    je outOfBounds
+    cmp word[nextPosition + 2], 0
+    je outOfBounds
+    cmp word[nextPosition], 7
+    je outOfBounds
+    cmp word[nextPosition + 2], 7
+    je outOfBounds
+    mov rax, 0
+    ret
+    outOfBounds:
+      mov rax, 1
+      ret
+    
+    
+
 
   ; INCREMENTA "nextPosition" SEGÚN EL MOVIMIENTO RECIBIDO
   incrementPosition:
