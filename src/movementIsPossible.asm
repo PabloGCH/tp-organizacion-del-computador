@@ -13,7 +13,11 @@ section .text
   ;     RECIBE EN RSI LA DIRECCIÓN DE MEMORIA DE UN ARRAY DE 4 ELEMENTOS (DE 2 BYTES CADA UNO) (Fila de pieza, columna de pieza, fila de destino, columna de destino)
   ;     RECIBE EN RDX UN NUMERO QUE INDICA TIPO DE JUGADOR 0 (Soldados) O 1 (Oficiales)
   ;     RECIBE EN RCX LA DIRECCIÓN EN LA QUE SE ENCUENTRA LA FORTALEZA (0 = Up, 1 = Right, 2 = Down, 3 = Left)
-  ; POST-COND: RETORNA 0 SI EL MOVIMIENTO NO ES POSIBLE
+  ; POST-COND:
+  ;     RETORNA 0 SI EL MOVIMIENTO NO ES POSIBLE
+  ;     RETORNA 1 SI EL MOVIMIENTO ES POSIBLE
+  ;     RETORNA 2 SI NO SE REALIZO MOVIMIENTO POR MUERTE DE OFICIAL
+
 
   movementIsPossible:
     mov     byte[playerType],    dl

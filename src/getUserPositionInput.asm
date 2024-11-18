@@ -3,7 +3,6 @@ extern gets
 extern validateInput
 extern validatePieceInput
 extern validateDestinationInput
-extern movementIsPossible
 
 extern strcmp
 extern quit
@@ -176,19 +175,6 @@ section .text
       mov     word[positions + 4],    ax
       mov     ax,    word[destinationColumn]
       mov     word[positions + 6],    ax
-
-    validateIfMovementIsPossible:
-      mov     rdi,    qword[board]
-      mov     rsi,    positions
-      mov     rdx,    qword[playerType]
-      mov     cl,     byte[strongholdDir]
-
-      sub     rsp,    8
-      call    movementIsPossible
-      add     rsp,    8
-
-      cmp     rax,    0
-      je      getPiecePosition
 
     mov     rax,    positions
     ret

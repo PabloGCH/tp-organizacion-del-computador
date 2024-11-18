@@ -10,6 +10,7 @@ extern printCurrentTurn
 extern movePiece
 extern checkGameStatus
 extern printQuitMessage
+extern movementIsPossible
 
 extern quit
 
@@ -31,6 +32,7 @@ section .data
 
 section .bss
   gameStatus resb 1
+  positions  resq 1
 
 section .text
   main:
@@ -53,36 +55,55 @@ section .text
       call printBoard
       add rsp, 8
 
-      mov rdi, board
-      mov rsi, [shift]
-      mov dl, byte[strongholdDir]
-      sub     rsp,    8
-      call    getUserPositionInput
-      add     rsp,    8
+      receiveInput:
+        mov rdi, board
+        mov rsi, [shift]
+        mov dl, byte[strongholdDir]
+        sub     rsp,    8
+        call    getUserPositionInput
+        add     rsp,    8
+        mov     qword[positions], rax
 
-      mov rsi, rax
-      mov rdi, board
-      mov dl, byte[strongholdDir]
-      sub     rsp,    8
-      call    movePiece
-      add     rsp,    8
+      validateIfMovementIsPossible:
+        mov     rdi,    board
+        mov     rsi,    qword[positions]
+        mov     rdx,    qword[shift]
+        mov     cl,     byte[strongholdDir]
 
-      mov rdi, board
-      mov esi, [stronghold]
-      sub rsp, 8
-      call checkGameStatus
-      add rsp, 8
+        sub     rsp,    8
+        call    movementIsPossible
+        add     rsp,    8
 
-      mov [gameStatus], al
+        cmp     rax,    0
+        je      receiveInput
 
-      cmp byte [gameStatus], -1
-      jne gameOver
+      
+      handleMovement:
+        mov     rsi,        qword[positions]
+        mov     rdi,        board
+        mov     dl,         byte[strongholdDir]
 
-      sub rsp, 8
-      call setShift
-      add rsp, 8
+        sub     rsp,        8
+        call    movePiece
+        add     rsp,        8
+      
+      checkIfGameContinues:
+        mov rdi, board
+        mov esi, [stronghold]
+        sub rsp, 8
+        call checkGameStatus
+        add rsp, 8
 
-      jmp mainGameLoop
+        mov [gameStatus], al
+
+        cmp byte [gameStatus], -1
+        jne gameOver
+
+        sub rsp, 8
+        call setShift
+        add rsp, 8
+
+        jmp mainGameLoop
   gameOver:
     ret
 
