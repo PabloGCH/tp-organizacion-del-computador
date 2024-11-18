@@ -1,9 +1,10 @@
 section .data
-
+  differenceBetweenRows db 0
+  differenceBetweenColumns db 0
 
 section .bss
-    origin times 2 resb 1      ; Array de 2 elementos de 1b
-    destination times 2 resb 1 ; Idem
+    origin        times 2   resb 1      ; Array de 2 elementos de 1b
+    destination   times 2   resb 1 ; Idem
 
 section .text
     global returnDirection
@@ -77,3 +78,19 @@ section .text
         
     end:
         ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

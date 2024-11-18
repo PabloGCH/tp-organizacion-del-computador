@@ -12,6 +12,7 @@ section .data
   unexpectedErrorMsg                        db    "Error inesperado", 10, 0
   cellAfterSoldierMustBeEmptyMsg            db    "La casilla despues del soldado debe estar vacia", 10, 0
   direction                                 db    0     
+  difference                                dw    0    
 
 section .bss
   board                                     resq  1
@@ -53,6 +54,40 @@ section .text
       mov  ax,  word[startPosition + 2]
       mov  word[nextPosition + 2],  ax
 
+
+    ; NO NECESITA CHEQUEAR QUE NO SEAN LAS DOS DIFERENCIAS 0 PORQUE EL DESTINO NUNCA SERA IGUAL A LA POSICION ACTUAL
+    ; PORQUE SE VERIFICA QUE EL DESTINO ESTE VACIO EN UNA VALIDACION PREVIA
+    checkIfDirectPathIsPossible:
+      ; Se verifica la diferencia entre filas
+      mov ax, word[startPosition]
+      sub ax, word[endPosition]
+
+      sub rsp, 8
+      call calculateModuleOfAx
+      add rsp, 8
+
+      cmp ax, 0                     ; Si no hubo diferencia es un movimiento horizontal
+      je convertPositions
+
+      mov word[difference], ax
+
+      ; Se verifica la diferencia entre columnas
+      mov ax, word[startPosition + 2]
+      sub ax, word[endPosition + 2]
+
+      sub rsp, 8
+      call calculateModuleOfAx
+      add rsp, 8
+
+      cmp ax, 0                     ; Si no hubo diferencia es un movimiento vertical
+      je convertPositions
+
+      ; Se comparan las diferencias
+      cmp ax, word[difference]      ; Si la diferencia en x es igual a la diferencia en y es un movimiento diagonal
+      je convertPositions
+
+      jmp noPathToDestination
+
     convertPositions:
       ; TRANSFORMA LAS POSICIONES QUE SE RECIBEN AL FORMATO REQUERIDO POR "returnDirection"
       mov  ax,  word[rsi]
@@ -63,6 +98,7 @@ section .text
       mov  byte[positions + 2],  al
       mov  ax,  word[rsi + 6]
       mov  byte[positions + 3],  al
+    
 
     getDirection:
       mov  dil,  byte[positions + 1]    ; Columna (x)
@@ -212,11 +248,13 @@ section .text
       dec     word[nextPosition + 2]
       ret
 
-  calculateModuleOfAx:
-    cmp     ax,    0
-    jl      negative
-    ret
-    negative:
-      neg     ax
-      ret
 
+
+
+    calculateModuleOfAx:
+      cmp     ax,    0
+      jl      negative
+      ret
+      negative:
+        neg     ax
+        ret
