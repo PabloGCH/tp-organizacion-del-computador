@@ -11,6 +11,7 @@ section .data
   obstaclesInTheWayMsg                      db    "Hay obstaculos en el camino", 10, 0
   unexpectedErrorMsg                        db    "Error inesperado", 10, 0
   cellAfterSoldierMustBeEmptyMsg            db    "La casilla despues del soldado debe estar vacia", 10, 0
+  positionAfterSoldierMustBeDestinationMsg  db    "La casilla despues del soldado debe ser la de destino", 10, 0
   direction                                 db    0     
   difference                                dw    0    
 
@@ -170,10 +171,19 @@ section .text
       add  rsp,  8
       
       cmp  al,  0
-      je  valid
+      je  positionAfterSoldierMustBeDestination
     
       mov    qword[errorMsg],    cellAfterSoldierMustBeEmptyMsg
       jmp    invalid
+
+      positionAfterSoldierMustBeDestination:
+        mov  eax,  dword[nextPosition]
+        cmp  eax,  dword[endPosition]
+        je  valid
+
+        mov    qword[errorMsg],  positionAfterSoldierMustBeDestinationMsg
+        jmp    invalid
+        
     
     obstaclesInTheWay:
       mov    qword[errorMsg],    obstaclesInTheWayMsg
