@@ -43,3 +43,4 @@ section .text
     mov rdx, qword[statCounter + 10]; statCounter + 10 -> Movimientos Oficial II [11,12,13,14,15,16,17,18]
     mov cl, byte[statCounter + 9]   ; statCounter + 9  -> Capturas    Oficial II [10]
     call printStats
+    ret
