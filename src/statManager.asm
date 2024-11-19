@@ -4,6 +4,7 @@
 ; 0-8 Primer Oficial | 9-17 Segundo oficial
 ; 0/9 Capturas. 2-8/10-17 Direcciones 
 
+extern printStats
 section .data
         statCounter times 18 db 0
 section .bss
@@ -33,3 +34,13 @@ section .text
         add rdi, rsi ; Posicion del array deseada
         mov byte[statCounter + rdi], dl ; Le cambia al contenido deseado al contenido de DL
         ret
+
+    global statCounterPrint
+    ; Le envia todos los datos a printStats y la llama
+    statCounterPrint:
+    mov rdi, qword[statCounter + 1] ; statCounter + 1  -> Movimientos Oficial I  [2,3,4,5,6,7,8,9]
+    mov sil, byte[statCounter]      ; statcounter + 0  -> Capturas    Oficial I  [1]
+    mov rdx, qword[statCounter + 10]; statCounter + 10 -> Movimientos Oficial II [11,12,13,14,15,16,17,18]
+    mov cl, byte[statCounter + 9]   ; statCounter + 9  -> Capturas    Oficial II [10]
+    call printStats
+    ret
