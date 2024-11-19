@@ -40,6 +40,6 @@ section .text
     statCounterPrint:
     mov rdi, qword[statCounter + 1] ; statCounter + 1  -> Movimientos Oficial I  [2,3,4,5,6,7,8,9]
     mov sil, byte[statCounter]      ; statcounter + 0  -> Capturas    Oficial I  [1]
-    mov rdx, qword[statcounter + 10]; statCounter + 10 -> Movimientos Oficial II [11,12,13,14,15,16,17,18]
+    mov rdx, qword[statCounter + 10]; statCounter + 10 -> Movimientos Oficial II [11,12,13,14,15,16,17,18]
     mov cl, byte[statCounter + 9]   ; statCounter + 9  -> Capturas    Oficial II [10]
     call printStats
