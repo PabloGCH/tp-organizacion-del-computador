@@ -5,6 +5,9 @@
 ; R8B: Dirección de la fortaleza
 ; CX : Caracter Soldado (CL) y Oficial (CH)
 
+
+; NOTA PARA EL FUTURO: FREAD GUARDA LA POSICION!
+
 %include "macros.asm"
 extern fopen
 extern fwrite
@@ -60,22 +63,11 @@ section .text
             ; Guardamos una fila
             mov rdi, [boardPointer] ; Input
             mov rsi, 1              ; Tamaño de los elementos
-            mov rdx, 7              ; Guardamos una fila
+            mov rdx, 49             ; Guardamos una fila
             mov rcx, [saveFile]     ; Archivo destino
             sub rsp, 8
             call fwrite
-            ; NewLine
             add rsp, 8
-            mov rdi, newLine        ; no [] porque quiero puntero
-            mov rsi, [saveFile]
-            sub rsp, 8
-            call fputs
-            add rsp, 8
-            ; Sumamos al contador
-            inc byte[boardCounter]
-            add byte[boardPointer], 7
-            cmp byte[boardCounter], 7
-            jl saveBoard
 
         end:
             ret
