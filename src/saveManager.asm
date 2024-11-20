@@ -104,5 +104,8 @@ section .text
             call fwrite
             add rsp, 8
 
-        end:
-            ret
+        ret
+
+    global loadGame
+    loadGame:
+        ; TODO
