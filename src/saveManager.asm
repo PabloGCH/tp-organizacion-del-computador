@@ -1,14 +1,16 @@
-; SAVE/LOAD Game Subroutines
-; RDI: Puntero a la matriz [7][7]
-; RSI: Puntero a las stats [18]
-; RDX: Puntero q apunta al vector con la ubicacion de la fortaleza [4]
-; R8B: Dirección de la fortaleza
-; CX : Caracter Soldado (CL) y Oficial (CH)
-
-
 ; NOTA PARA EL FUTURO: FREAD GUARDA LA POSICION!
+; SAVE/LOAD Game Subroutines
+
+; Inputs (Punteros)
+; RDI: Matriz       7  x 7
+; RSI: Stats        18 x 1
+; RDX: FortalezaLoc 4  x 1
+; RCX: FortalezaDir 1  x 1
+; R8 : Turno        1  x 1
+; R9 : Caracteres   2  x 1 
 
 %include "macros.asm"
+
 extern fopen
 extern fwrite
 extern fputs
@@ -29,11 +31,14 @@ section .bss
     savePath          resb 16; TODO validar input, si es posible
     saveFile          resq 1; "Puntero" al archivo
 
-    boardPointer      resq 1 ; Tablero
-    statsPointer      resq 1 ; Stats
-    fortressPointer   resq 1 ; Ubicacion fortaleza
-    fortressDirection resb 1 ; Direccion fortaleza
-    characters        resb 2 ; Caracter soldado/oficial
+    ; Pointers
+    gameBoard         resq 1 ; Tablero
+    statScoreboard    resq 1 ; Stats
+    fortressLocation  resq 1 ; Ubicacion fortaleza
+    fortressDirection resq 1 ; Direccion fortaleza
+    currentTurn       resq 1 ; Turno actual
+    characters        resq 1 ; Caracter soldado/oficial
+
 section .text
 
     global saveGame
@@ -41,11 +46,12 @@ section .text
 
         ; Guardamos inputs en variables para no pisarlos
 
-        mov qword[boardPointer],     rdi
-        mov qword[statsPointer],     rsi
-        mov qword[fortressPointer],  rdx
-        mov byte[fortressDirection], r8b
-        mov word [characters]      , cx
+        mov qword[gameBoard]          , rdi
+        mov qword[statScoreboard]     , rsi
+        mov qword[fortressLocation]   , rdx
+        mov qword[fortressDirection]  , rcx
+        mov qword[currentTurn]        , r8
+        mov qword[characters]         , r9
 
         ; read para pedir archivo a donde guardar
         read askSaveFilePath, savePath, saveFileFormat, savePath ; Es necesario validar que no sea mas de 16 caracteres?
@@ -55,9 +61,9 @@ section .text
         call fopen
         mov qword[saveFile], rax ; Asumo que devuelve en rax como deberia
 
-        ; Guardamos la matriz
+        ; Gameboard 7x7
         saveBoard:
-            mov rdi, [boardPointer] ; Input
+            mov rdi, [gameBoard]    ; Input
             mov rsi, 1              ; Tamaño de los elementos
             mov rdx, 49             ; Cantidad de elementos
             mov rcx, [saveFile]     ; Archivo destino
@@ -65,9 +71,9 @@ section .text
             call fwrite
             add rsp, 8
 
-        ; Guardamos el scoreboard
+        ; Scoreboard 18x1
         saveStats:
-            mov rdi, [statsPointer]
+            mov rdi, [statScoreboard]
             mov rsi, 1
             mov rdx, 18
             mov rcx, [saveFile] 
@@ -75,9 +81,9 @@ section .text
             call fwrite
             add rsp, 8
         
-        ; Guardamos la ubicación de la fortaleza
+        ; Fortress Location 4x1
         saveFortressL:
-            mov rdi, [fortressPointer]
+            mov rdi, [fortressLocation]
             mov rsi, 1
             mov rdx, 4
             mov rcx, [saveFile] 
@@ -85,9 +91,9 @@ section .text
             call fwrite
             add rsp, 8
 
-        ; Guardamos la dirección de la fortaleza
+        ; Fortress Direction 1x1
         saveFortressD:
-            mov rdi, fortressDirection ; Queremos el pointer => Sin []
+            mov rdi, [fortressDirection]
             mov rsi, 1
             mov rdx, 1
             mov rcx, [saveFile] 
@@ -95,16 +101,32 @@ section .text
             call fwrite
             add rsp, 8
 
+        ; Current Turn 1x1
+        saveTurn:
+            mov rdi, [currentTurn]
+            mov rsi, 1
+            mov rdx, 1
+            mov rcx, [saveFile]
+            sub rsp, 8
+            call fwrite
+            add rsp, 8
+
+        ; Game Pieces 2x1
         saveCharacters:
-            mov rdi, characters ; Queremos el pointer => Sin []
+            mov rdi, [characters]
             mov rsi, 1
             mov rdx, 2
             mov rcx, [saveFile]
             sub rsp, 8
             call fwrite
             add rsp, 8
-
-        ret
+        
+        saveEnd:
+            mov rdi, [saveFile]
+            sub rsp, 8
+            call fclose
+            add rsp, 8
+            ret 
 
     global loadGame
     loadGame:
