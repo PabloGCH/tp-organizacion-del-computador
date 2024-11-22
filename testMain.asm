@@ -24,3 +24,4 @@ section .text
         sub rsp, 8
         call saveGame
         add rsp, 8
+        ret
