@@ -7,7 +7,8 @@
 ; RDX: FortalezaLoc 4  x 1
 ; RCX: FortalezaDir 1  x 1
 ; R8 : Turno        1  x 1
-; R9 : Caracteres   2  x 1 
+; R9 : Caracteres   2  x 1
+; R10: Archivo, abierto en modo deseado (R/W)
 
 %include "macros.asm"
 
@@ -18,18 +19,8 @@ extern fclose
 
 section .data
 
-    modeWrite db "w"
-    modeRead db "r"
-
-    askSaveFilePath db "Ingrese el nombre (Maximo 16 caracteres) del archivo de guardado: ", 10, 0 ; Ambiguo para poder usarlo en save Y load :)
-    saveFileFormat db "%c"
-    newLine db 10,0
-
-    boardCounter db 0
-
 section .bss
-    savePath          resb 16; TODO validar input, si es posible
-    saveFile          resq 1; "Puntero" al archivo
+    saveFile          resq 1  ; "Puntero" al archivo
 
     ; Pointers
     pGameBoard         resq 1  ; Tablero
@@ -61,13 +52,7 @@ section .text
         mov qword[pCurrentTurn]        , r8
         mov qword[pCharacters]         , r9
 
-        ; read para pedir archivo a donde guardar
-        read askSaveFilePath, savePath, saveFileFormat, savePath ; Es necesario validar que no sea mas de 16 caracteres?
-        ; Abrimos el archivo en Write
-        lea rdi, savePath 
-        mov rsi, modeWrite
-        call fopen
-        mov qword[saveFile], rax ; Asumo que devuelve en rax como deberia
+        mov qword[saveFile], r10
 
         ; Gameboard 7x7
         saveBoard:
@@ -148,13 +133,7 @@ section .text
         mov qword[pCurrentTurn]        , r8
         mov qword[pCharacters]         , r9
 
-        ; read para pedir archivo que cargar
-        read askSaveFilePath, savePath, saveFileFormat, savePath ; Es necesario validar que no sea mas de 16 caracteres?
-        ; Abrimos el archivo en Read
-        lea rdi, savePath 
-        mov rsi, modeRead
-        call fopen
-        mov qword[saveFile], rax
+        mov qword[saveFile], r10
 
         load:
             loadBoard:
