@@ -3,6 +3,9 @@ global main
 
 ; FUNCIONES EXTERNAS
 extern system
+extern printf
+extern fopen
+extern gets
 ; SUBRUTINAS
 extern getUserPositionInput
 extern printBoard
@@ -10,7 +13,11 @@ extern printCurrentTurn
 extern movePiece
 extern checkGameStatus
 extern printQuitMessage
+extern printSaveMessage
 extern movementIsPossible
+extern startScreen
+extern statCounterGetPointer
+extern loadGame
 
 extern quit
 
@@ -30,17 +37,89 @@ section .data
   characters            db      'XO ', 0
   shift                 db       0 ; 0 = Soldiers, 1 = Officers
 
+  messageLoadGame       db 'Ingrese el nombre del archivo guardado: ', 0
+  messageLoadError      db 'Ese archivo no existe. Volviendo al inicio.', 10, 0
+
+    modeRead db 'r', 0
+
 section .bss
   gameStatus resb 1
   positions  resq 1
 
+  mainLoadPath resb 128
+
 section .text
   main:
+
+      sub rsp, 8
+      call startScreen
+      add rsp, 8
+      cmp rax, 1
+      je mainGameLoop
+      cmp rax, 2
+      je mainLoadGame
+      jmp mainQuit ; Solo da valores entre 1 y 3, asi que por descarte...
+
+    mainLoadGame:
+
+      mov rdi, messageLoadGame
+      sub rsp, 8
+      call printf
+      add rsp, 8
+      mov rdi, mainLoadPath
+      sub rsp, 8
+      call gets
+      add rsp, 8
+      
+      mov rdi, mainLoadPath
+      mov rsi, modeRead
+      sub rsp, 8
+      call fopen
+      add rsp, 8
+      cmp rax, 0
+      je startScreenLoadError
+
+      mov r10, rax
+      mov rdi, board
+      sub rsp, 8
+      call statCounterGetPointer
+      add rsp, 8
+      mov rsi, rax
+      
+      mov rdx, stronghold
+      mov rcx, strongholdDir
+      mov r8, shift
+      mov r9, characters
+      sub rsp, 8
+      call loadGame
+      add rsp, 8
+      jmp mainGameLoop
+
+      startScreenLoadError:
+          mov rdi, messageLoadError
+          sub rsp, 8
+          call printf
+          add rsp, 8
+          jmp main
+
+
+    mainQuit:
+
+      sub    rsp,    8
+      call   quit
+      add    rsp,    8
+      ret
+
+
     mainGameLoop:
+
       command cmd_clear
 
       sub rsp, 8
       call printQuitMessage
+      add rsp, 8
+      sub rsp, 8
+      call printSaveMessage
       add rsp, 8
 
       mov rdi, [shift]

@@ -19,6 +19,8 @@ extern fclose
 
 section .data
 
+    msgSave db 27,'[90mIngrese "Save" para guardar la partida',27,"[0m", 10, 0
+
 section .bss
     saveFile          resq 1  ; "Puntero" al archivo
 
@@ -234,3 +236,11 @@ section .text
             call fclose
             add rsp, 8
             ret 
+
+    global printSaveMessage
+    printSaveMessage:
+        mov rdi, msgSave
+        sub rsp, 8
+        call printf
+        add rsp, 8
+        ret
