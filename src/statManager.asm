@@ -19,6 +19,11 @@ section .text
         mov al, byte[statCounter + rdi] ; Mueve el contenido deseado a AL
         ret
 
+    global statCounterGetPointer
+    statCounterGetPointer:
+        lea rax, statCounter
+        ret
+
     global statCounterAdd
     ; Le agrega al contenido del array en la posicion dil el contenido de SIL 
     statCounterAdd:
