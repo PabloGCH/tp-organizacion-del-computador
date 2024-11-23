@@ -1,6 +1,6 @@
 section .data
   invalidCharError  db  "Error: Invalid rotation char", 0
-  allowedChars      db  "UDLR", 0
+  allowedChars      db  "12345", 0
 
   ; Definicion de matrices de rotacion para copia posterior
   matrixUp  db    -1, -1,  0,  0,  2, -1, -1, \
@@ -33,10 +33,7 @@ section .data
                     1,  1,  1,  1,  0,  0,  0, \
                     1,  1,  1,  1,  0,  0,  2, \
                    -1, -1,  1,  1,  1, -1, -1, \
-                   -1, -1,  2,  1,  1, -1, -1
-
-section .bss
-  boardMatrix resq 1
+                   -1, -1,  1,  1,  1, -1, -1
 
 section .text
   global processBoardRotation
@@ -52,14 +49,14 @@ processBoardRotation:
   push rbx
   push rcx
 
-  ; Verificamos que el caracter enviado esta en mayusculas
-  cmp al, 'A'
+  ; Verificamos que el caracter enviado esta en el rango aceptable
+  cmp al, '1'
   jl invalidInput
-  cmp al, 'Z'
+  cmp al, '5'
   jg invalidInput
 
   ; Validar que el caracter sea uno permitido. Cargamos el nro de caracteres validos en rcx y la direccion de la 'tabla' en rbx
-  mov rcx, 4
+  mov rcx, 5
   lea rbx, [allowedChars]
 
 checkCaracterLoop:
@@ -74,22 +71,32 @@ checkCaracterLoop:
 
 validInput:
   ; Comparar el caracter de rotacion guardado en al con los casos validos
-  cmp al, 'U'
+  cmp al, '2'
   je rotationUp
 
-  cmp al, 'D'
+  cmp al, '1'
   je rotationDown
 
-  cmp al, 'L'
+  cmp al, '3'
   je rotationLeft
 
-  cmp al, 'R'
+  cmp al, '4'
   je rotationRight
+
+  cmp al, '5'
+  je cancel
 
 invalidInput:
   ; Si el valor no es válido, guarda un 0 en la matriz y un mensaje de error en el rax
-  mov rax, invalidCharError
-  mov qword[boardMatrix], 0
+  mov rax, 1
+  xor rcx, rcx
+  rep stosb
+  jmp cleanup
+
+cancel:
+  ; Cancelar operacion
+  mov rax, 2
+  jmp cleanup
 
 cleanup:
   ; Restaurar los registros
@@ -121,4 +128,5 @@ rotationRight:
 copyMatrix:
   mov rcx, 49
   rep movsb
+  mov rax, 0
   jmp cleanup

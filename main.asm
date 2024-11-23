@@ -32,6 +32,8 @@ section .data
   characters            db      'XO ', 0
   shift                 db       0 ; 0 = Soldiers, 1 = Officers
 
+  messageRotationError  db 'Esa orientacion es invalida. ', 0
+
   messageLoadGame       db 'Ingrese el nombre del archivo guardado: ', 0
   messageLoadError      db 'Ese archivo no existe. Volviendo al inicio.', 10, 0
 
@@ -118,6 +120,21 @@ section .text
       sub rsp, 8
       call processBoardRotation
       add rsp, 8
+
+      ; Verificar si el input era valido
+      cmp rax, 0
+      je mainGameLoop
+
+      ; Verificar si es un Back
+      cmp rax, 2
+      je main
+
+      ; Si no fue valido, mostrar mensaje de error
+      mov rdi, messageRotationError
+      sub rsp, 8
+      call printf
+      add rsp, 8
+      jmp mainBoardSelect
 
     mainGameLoop:
 
