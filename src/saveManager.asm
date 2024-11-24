@@ -16,10 +16,12 @@ extern fopen
 extern fwrite
 extern fread
 extern fclose
+extern printf
 
 section .data
 
-    msgSave db 27,'[90mIngrese "Save" para guardar la partida',27,"[0m", 10, 0
+    msgSave  db 27,'[90mIngrese "Save" para guardar la partida',27,"[0m", 10, 0
+    msgSaved db "Guardado!", 10, 0
 
 section .bss
     saveFile          resq 1  ; "Puntero" al archivo
@@ -120,6 +122,10 @@ section .text
             mov rdi, [saveFile]
             sub rsp, 8
             call fclose
+            add rsp, 8
+            sub rsp, 8
+            mov rdi, msgSaved
+            call printf
             add rsp, 8
             ret 
 

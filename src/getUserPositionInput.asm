@@ -253,6 +253,7 @@ mainSaveGame:
 
   mov rdi, messageSaveGame
   call printf
+
   mov rdi, mainSavePath
   call gets
       
