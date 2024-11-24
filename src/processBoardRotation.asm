@@ -149,7 +149,7 @@ rotationLeft:
   mov byte[rsi+3], 4
 
   ; Cargar ubicacion de stronghold
-  mov byte[rdx], 4
+  mov byte[rdx], 3
 
   ; Copiar matriz de tablero
   lea rsi, [matrixLeft]     ; Cargar direccion de matrixLeft
