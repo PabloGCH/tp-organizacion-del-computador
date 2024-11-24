@@ -77,7 +77,7 @@ section .text
       call fopen
       add rsp, 8
       cmp rax, 0
-      je startScreenLoadError
+      je mainLoadError
 
       mov r10, rax
       mov rdi, board
@@ -95,7 +95,7 @@ section .text
       add rsp, 8
       jmp mainGameLoop
 
-      startScreenLoadError:
+      mainLoadError:
           mov rdi, messageLoadError
           sub rsp, 8
           call printf
