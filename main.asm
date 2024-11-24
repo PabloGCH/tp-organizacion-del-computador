@@ -113,7 +113,7 @@ section .text
 
     mainGameLoop:
 
-      command cmd_clear
+      ;command cmd_clear
 
       sub rsp, 8
       call printQuitMessage
@@ -135,9 +135,17 @@ section .text
       add rsp, 8
 
       receiveInput:
+      ; Inputs necesarios para llamar save desde getUserInputPosition
         mov rdi, board
-        mov rsi, [shift]
-        mov dl, byte[strongholdDir]
+        sub rsp, 8
+        call statCounterGetPointer
+        add rsp, 8
+        mov rsi, rax
+        mov rdx, stronghold
+        mov rcx, strongholdDir
+        mov r8, shift
+        mov r9, characters
+
         sub     rsp,    8
         call    getUserPositionInput
         add     rsp,    8
