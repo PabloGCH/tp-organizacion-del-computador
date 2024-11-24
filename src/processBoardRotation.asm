@@ -41,6 +41,10 @@ section .text
 ; ========== Funcion principal ========== ;
 
 processBoardRotation:
+  ; rdi = Direccion del tablero
+  ; rsi = Direccion de stronghold (array de 4 valores)
+  ; rdx = Direccion de strongholdDir (orientacion del tablero)
+
   ; Guardo la base de la pila para volver luego y tomo como base el tope actual
   push rbp
   mov rbp, rsp
@@ -110,18 +114,58 @@ cleanup:
 ; ========== Rotaciones ========== ;
 
 rotationUp:
+  ; Cargar valores de stronghold
+  mov byte[rsi], 2
+  mov byte[rsi+1], 4
+  mov byte[rsi+2], 0
+  mov byte[rsi+3], 2
+
+  ; Cargar ubicacion de stronghold
+  mov byte[rdx], 0
+
+  ; Copiar matriz de tablero
   lea rsi, [matrixUp]       ; Cargar direccion de matrixUp
   jmp copyMatrix
 
 rotationDown:
+  ; Cargar valores de stronghold
+  mov byte[rsi], 2
+  mov byte[rsi+1], 4
+  mov byte[rsi+2], 4
+  mov byte[rsi+3], 6
+
+  ; Cargar ubicacion de stronghold
+  mov byte[rdx], 2
+
+  ; Copiar matriz de tablero
   lea rsi, [matrixDown]     ; Cargar direccion de matrixDown
   jmp copyMatrix
 
 rotationLeft:
+  ; Cargar valores de stronghold
+  mov byte[rsi], 0
+  mov byte[rsi+1], 2
+  mov byte[rsi+2], 2
+  mov byte[rsi+3], 4
+
+  ; Cargar ubicacion de stronghold
+  mov byte[rdx], 4
+
+  ; Copiar matriz de tablero
   lea rsi, [matrixLeft]     ; Cargar direccion de matrixLeft
   jmp copyMatrix
 
 rotationRight:
+  ; Cargar valores de stronghold
+  mov byte[rsi], 4
+  mov byte[rsi+1], 6
+  mov byte[rsi+2], 2
+  mov byte[rsi+3], 4
+
+  ; Cargar ubicacion de stronghold
+  mov byte[rdx], 1
+
+  ; Copiar matriz de tablero
   lea rsi, [matrixRight]    ; Cargar direccion de matrixRight
   jmp copyMatrix
 
