@@ -116,10 +116,10 @@ section .text
       ;command cmd_clear
 
       sub rsp, 8
-      call printQuitMessage
+      call printSaveMessage
       add rsp, 8
       sub rsp, 8
-      call printSaveMessage
+      call printQuitMessage
       add rsp, 8
 
       mov rdi, [shift]

@@ -168,7 +168,6 @@ section .text
 
       mov     rdx,    destinationRow
       mov     rcx,    destinationColumn
-
       sub     rsp,    8
       call    sscanf
       add     rsp,    8
@@ -252,7 +251,9 @@ quitGame:
 mainSaveGame:
 
   mov rdi, messageSaveGame
+  sub rsp, 8
   call printf
+  add rsp, 8
 
   mov rdi, mainSavePath
   call gets
