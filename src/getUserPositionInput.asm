@@ -15,7 +15,7 @@ section .data
   msgPiecePosition             db     "Ingrese la fila y columna de la pieza (Separado por espacios): ", 0
   msgDestination               db     "Ingrese la fila y columna de destino (Separado por espacios): ", 0
   msgInvalidPosition           db     "Posicion invalida, intente de nuevo", 10, 0
-  formatInput                  db     "%d %d", 0
+  formatInput                  db     "%hd %hd", 0
   quitStr                      db     "Quit", 0
   quitLowerStr                 db     "quit", 0
   saveStr                      db     "Save", 0
@@ -162,6 +162,11 @@ section .text
       sub     rsp,    8
       call    validateQuit
       add     rsp,    8
+
+      mov     rdi, inputText
+      sub     rsp, 8
+      call    validateSave
+      add     rsp, 8
 
       mov     rdi,    inputText
       mov     rsi,    formatInput

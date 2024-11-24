@@ -136,11 +136,11 @@ section .text
 
       receiveInput:
       ; Inputs necesarios para llamar save desde getUserInputPosition
-        mov rdi, board
         sub rsp, 8
         call statCounterGetPointer
         add rsp, 8
         mov rsi, rax
+        mov rdi, board
         mov rdx, stronghold
         mov rcx, strongholdDir
         mov r8, shift
@@ -165,9 +165,7 @@ section .text
         je      receiveInput
         cmp     rax,    2
         je      checkIfGameContinues
-        
 
-      
       handleMovement:
         mov     rsi,        qword[positions]
         mov     rdi,        board
@@ -176,7 +174,7 @@ section .text
         sub     rsp,        8
         call    movePiece
         add     rsp,        8
-      
+
       checkIfGameContinues:
         mov rdi, board
         mov esi, [stronghold]
