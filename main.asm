@@ -76,7 +76,7 @@ section .text
       call fopen
       add rsp, 8
       cmp rax, 0
-      je startScreenLoadError
+      je mainLoadError
 
       mov r10, rax
       mov rdi, board
@@ -94,7 +94,7 @@ section .text
       add rsp, 8
       jmp mainGameLoop
 
-      startScreenLoadError:
+      mainLoadError:
           mov rdi, messageLoadError
           sub rsp, 8
           call printf
@@ -140,13 +140,13 @@ section .text
 
     mainGameLoop:
 
-      command cmd_clear
+      ;command cmd_clear
 
       sub rsp, 8
-      call printQuitMessage
+      call printSaveMessage
       add rsp, 8
       sub rsp, 8
-      call printSaveMessage
+      call printQuitMessage
       add rsp, 8
 
       mov rdi, [shift]
@@ -162,9 +162,17 @@ section .text
       add rsp, 8
 
       receiveInput:
+      ; Inputs necesarios para llamar save desde getUserInputPosition
+        sub rsp, 8
+        call statCounterGetPointer
+        add rsp, 8
+        mov rsi, rax
         mov rdi, board
-        mov rsi, [shift]
-        mov dl, byte[strongholdDir]
+        mov rdx, stronghold
+        mov rcx, strongholdDir
+        mov r8, shift
+        mov r9, characters
+
         sub     rsp,    8
         call    getUserPositionInput
         add     rsp,    8
@@ -184,9 +192,7 @@ section .text
         je      receiveInput
         cmp     rax,    2
         je      checkIfGameContinues
-        
 
-      
       handleMovement:
         mov     rsi,        qword[positions]
         mov     rdi,        board
@@ -195,7 +201,7 @@ section .text
         sub     rsp,        8
         call    movePiece
         add     rsp,        8
-      
+
       checkIfGameContinues:
         mov rdi, board
         mov esi, [stronghold]
