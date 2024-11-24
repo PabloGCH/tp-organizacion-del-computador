@@ -16,29 +16,31 @@ extern fopen
 extern fwrite
 extern fread
 extern fclose
+extern printf
 
 section .data
 
-    msgSave db 27,'[90mIngrese "Save" para guardar la partida',27,"[0m", 10, 0
+    msgSave  db 27,'[90mIngrese "Save" para guardar la partida',27,"[0m", 10, 0
+    msgSaved db "Guardado!", 10, 0
 
 section .bss
     saveFile          resq 1  ; "Puntero" al archivo
 
     ; Pointers
-    pGameBoard         resq 1  ; Tablero
-    pStatScoreboard    resq 1  ; Stats
-    pFortressLocation  resq 1  ; Ubicacion Fortaleza
-    pFortressDirection resq 1  ; Direccion Fortaleza
-    pCurrentTurn       resq 1  ; Turno Actual
-    pCharacters        resq 1  ; Caracter Soldado/Oficial
+    pointerBoard             resq 1  ; Tablero
+    pointerScore             resq 1  ; Stats
+    pointerStrongholdL       resq 1  ; Ubicacion Fortaleza
+    pointerStrongholdD       resq 1  ; Direccion Fortaleza
+    pointerCurrentTurn       resq 1  ; Turno Actual
+    pointerCharacters        resq 1  ; Caracter Soldado/Oficial
 
     ; Data Storage
-    dGameBoard         times 49 resb 1 ; Tablero
-    dStatScoreboard    times 18 resb 1 ; Stats
-    dFortressLocation  times 4  resb 1 ; Ubicacion Fortaleza
-    dFortressDirection times 1  resb 1 ; Direccion Fortaleza  
-    dCurrentTurn       times 1  resb 1 ; Turno Actual
-    dCharacters        times 2  resb 1 ; Caracter Soldado/Oficial
+    dataBoard             times 49 resb 1 ; Tablero
+    dataScore             times 18 resb 1 ; Stats
+    dataStrongholdL       times 4  resb 1 ; Ubicacion Fortaleza
+    dataStrongholdD       times 1  resb 1 ; Direccion Fortaleza  
+    dataCurrentTurn       times 1  resb 1 ; Turno Actual
+    dataCharacters        times 2  resb 1 ; Caracter Soldado/Oficial
 
 section .text
 
@@ -47,18 +49,18 @@ section .text
 
         ; Guardamos inputs en variables para no pisarlos
 
-        mov qword[pGameBoard]          , rdi
-        mov qword[pStatScoreboard]     , rsi
-        mov qword[pFortressLocation]   , rdx
-        mov qword[pFortressDirection]  , rcx
-        mov qword[pCurrentTurn]        , r8
-        mov qword[pCharacters]         , r9
+        mov qword[pointerBoard],       rdi
+        mov qword[pointerScore],       rsi
+        mov qword[pointerStrongholdL], rdx
+        mov qword[pointerStrongholdD], rcx
+        mov qword[pointerCurrentTurn], r8
+        mov qword[pointerCharacters],  r9
 
-        mov qword[saveFile], r10
+        mov qword[saveFile],           r10
 
         ; Gameboard 7x7
         saveBoard:
-            mov rdi, [pGameBoard]    ; Input
+            mov rdi, [pointerBoard]    ; Input
             mov rsi, 1              ; Tamaño de los elementos
             mov rdx, 49             ; Cantidad de elementos
             mov rcx, [saveFile]     ; Archivo destino
@@ -68,7 +70,7 @@ section .text
 
         ; Scoreboard 18x1
         saveStats:
-            mov rdi, [pStatScoreboard]
+            mov rdi, [pointerScore]
             mov rsi, 1
             mov rdx, 18
             mov rcx, [saveFile] 
@@ -78,7 +80,7 @@ section .text
         
         ; Fortress Location 4x1
         saveFortressL:
-            mov rdi, [pFortressLocation]
+            mov rdi, [pointerStrongholdL]
             mov rsi, 1
             mov rdx, 4
             mov rcx, [saveFile] 
@@ -88,7 +90,7 @@ section .text
 
         ; Fortress Direction 1x1
         saveFortressD:
-            mov rdi, [pFortressDirection]
+            mov rdi, [pointerStrongholdD]
             mov rsi, 1
             mov rdx, 1
             mov rcx, [saveFile] 
@@ -98,7 +100,7 @@ section .text
 
         ; Current Turn 1x1
         saveTurn:
-            mov rdi, [pCurrentTurn]
+            mov rdi, [pointerCurrentTurn]
             mov rsi, 1
             mov rdx, 1
             mov rcx, [saveFile]
@@ -108,7 +110,7 @@ section .text
 
         ; Game Pieces 2x1
         saveCharacters:
-            mov rdi, [pCharacters]
+            mov rdi, [pointerCharacters]
             mov rsi, 1
             mov rdx, 2
             mov rcx, [saveFile]
@@ -121,6 +123,10 @@ section .text
             sub rsp, 8
             call fclose
             add rsp, 8
+            sub rsp, 8
+            mov rdi, msgSaved
+            call printf
+            add rsp, 8
             ret 
 
     global loadGame
@@ -128,18 +134,18 @@ section .text
 
         ; Guardamos inputs en variables para no pisarlos
 
-        mov qword[pGameBoard]          , rdi
-        mov qword[pStatScoreboard]     , rsi
-        mov qword[pFortressLocation]   , rdx
-        mov qword[pFortressDirection]  , rcx
-        mov qword[pCurrentTurn]        , r8
-        mov qword[pCharacters]         , r9
+        mov qword[pointerBoard]          , rdi
+        mov qword[pointerScore]     , rsi
+        mov qword[pointerStrongholdL]   , rdx
+        mov qword[pointerStrongholdD]  , rcx
+        mov qword[pointerCurrentTurn]        , r8
+        mov qword[pointerCharacters]         , r9
 
         mov qword[saveFile], r10
 
         load:
             loadBoard:
-                mov rdi, dGameBoard   ; Destination
+                mov rdi, dataBoard   ; Destination
                 mov rsi, 1            ; Size
                 mov rdx, 49           ; Count
                 mov rcx, [saveFile]   ; File
@@ -148,7 +154,7 @@ section .text
                 add rsp, 8
 
             loadStats:
-                mov rdi, dStatScoreboard
+                mov rdi, dataScore
                 mov rsi, 1
                 mov rdx, 18
                 mov rcx, [saveFile]
@@ -157,7 +163,7 @@ section .text
                 add rsp, 8
             
             loadFortressL:
-                mov rdi, dFortressLocation
+                mov rdi, dataStrongholdL
                 mov rsi, 1
                 mov rdx, 4
                 mov rcx, [saveFile]
@@ -166,7 +172,7 @@ section .text
                 add rsp, 8
 
             loadFortressD:
-                mov rdi, dFortressDirection
+                mov rdi, dataStrongholdD
                 mov rsi, 1
                 mov rdx, 1
                 mov rcx, [saveFile]
@@ -175,7 +181,7 @@ section .text
                 add rsp, 8
 
             loadTurn:
-                mov rdi, dCurrentTurn
+                mov rdi, dataCurrentTurn
                 mov rsi, 1
                 mov rdx, 1
                 mov rcx, [saveFile]
@@ -184,7 +190,7 @@ section .text
                 add rsp, 8
 
             loadCharacters:
-                mov rdi, dCharacters
+                mov rdi, dataCharacters
                 mov rsi, 1
                 mov rdx, 2
                 mov rcx, [saveFile]
@@ -195,38 +201,38 @@ section .text
         replace:
 
             replaceBoard:
-                mov rsi,  dGameBoard  ; Source
-                mov rdi, [pGameBoard] ; Destination
+                mov rsi,  dataBoard  ; Source
+                mov rdi, [pointerBoard] ; Destination
                 mov rcx, 49           ; Count
                 rep movsb             ; Copies RCX bytes from [RSI] to [RDI]
 
             replaceStats:
-                mov rsi,  dStatScoreboard
-                mov rdi, [pStatScoreboard]
+                mov rsi,  dataScore
+                mov rdi, [pointerScore]
                 mov rcx, 18
                 rep movsb
 
             replaceFortressL:
-                mov rsi,  dFortressLocation
-                mov rdi, [pFortressLocation]
+                mov rsi,  dataStrongholdL
+                mov rdi, [pointerStrongholdL]
                 mov rcx, 4
                 rep movsb
 
             replaceFortressD:
-                mov rsi,  dFortressDirection
-                mov rdi, [pFortressDirection]
+                mov rsi,  dataStrongholdD
+                mov rdi, [pointerStrongholdD]
                 mov rcx, 1
                 movsb
 
             replaceTurn:
-                mov rsi,  dCurrentTurn
-                mov rdi, [pCurrentTurn]
+                mov rsi,  dataCurrentTurn
+                mov rdi, [pointerCurrentTurn]
                 mov rcx, 1
                 movsb
 
             replaceCharacters:
-                mov rsi,  dCharacters
-                mov rdi, [pCharacters]
+                mov rsi,  dataCharacters
+                mov rdi, [pointerCharacters]
                 mov rcx, 2
                 rep movsb
         
