@@ -331,13 +331,13 @@ section .text
   nextPositionOutOfBounds:
     ; SI LA POSICION ESTA FUERA DEL TABLERO SE PRUEBA CON LA SIGUIENTE DIRECCIÓN
     cmp word[nextPosition], 0
-    je outOfBounds
+    jle outOfBounds
     cmp word[nextPosition + 2], 0
-    je outOfBounds
-    cmp word[nextPosition], 7
-    je outOfBounds
-    cmp word[nextPosition + 2], 7
-    je outOfBounds
+    jle outOfBounds
+    cmp word[nextPosition], 8
+    jge outOfBounds
+    cmp word[nextPosition + 2], 8
+    jge outOfBounds
     mov rax, 0
     ret
     outOfBounds:
