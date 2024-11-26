@@ -27,6 +27,10 @@ section .bss
 
   positions                                 times 4   resb   1    ; Solo se usa para "returnDirection"
 
+  officerToLookFor                          resb 1                ; 2 si es el oficial 1, 3 si es el oficial 2
+
+  validatingIdleOfficer                     resb 1                ; 0 si es la primera busqueda (Oficial que se movio), 1 si es la segunda (Oficial que no se movio)
+
 
 
 section .text
@@ -39,6 +43,8 @@ section .text
   validateOfficerMovementIsPossible:
 
     init:
+      mov  byte[validatingIdleOfficer],  0
+
       mov  qword[board],  rdi
 
       mov  ax,  word[rsi]
@@ -243,14 +249,37 @@ section .text
           sub rsp, 8
           call removePiece
           add rsp, 8
+    
+          cmp byte[validatingIdleOfficer], 1
+          je idleOfficerDies
 
-          mov rax, 2
-          ret
+          movingOfficerDies:
+            mov rax, 2
+            ret
+
+          idleOfficerDies:
+            mov rax, 1
+            ret
 
         officerDoesNotDie:
-          mov rax, 1
-          ret
-    
+          cmp byte[validatingIdleOfficer], 1               ; SI ESTE ES EL "OTRO" OFICIAL Y NO MURIO NO HAY NADA MAS QUE HACER
+          je officerDoesNotDieAndThereIsNoOtherOfficer
+
+          sub rsp, 8
+          call getPositionOfTheOtherOffice                 ; SETEA "startPosition" CON LA POSICIÓN DEL OTRO OFICIAL
+          add rsp, 8
+
+          cmp rax, 0
+          je officerDoesNotDieAndThereIsNoOtherOfficer
+
+          mov byte[validatingIdleOfficer], 1               ; SE SETEA COMO "true" QUE SE ESTA BUSCANDO EL OTRO OFICIAL
+
+          jmp checkForCapture                              ; SE REPITE LA VALIDACIÓN PARA EL OTRO OFICIAL
+          
+          officerDoesNotDieAndThereIsNoOtherOfficer:
+            mov rax, 1
+            ret
+        
     checkPositionNextToSoldier:
       mov  eax, dword[nextPosition]
       mov  dword[previousPosition], eax
@@ -327,7 +356,6 @@ section .text
 
 
 
-
   nextPositionOutOfBounds:
     ; SI LA POSICION ESTA FUERA DEL TABLERO SE PRUEBA CON LA SIGUIENTE DIRECCIÓN
     cmp word[nextPosition], 0
@@ -344,7 +372,62 @@ section .text
       mov rax, 1
       ret
     
-    
+  ; Setea startPosition con la posición del otro oficial
+  ; Retorna 0 si no se encuentra el oficial
+  getPositionOfTheOtherOffice:
+    mov rdi, qword[board]
+    mov rsi, startPosition
+
+    sub rsp, 8
+    call getBoardItem
+    add rsp, 8
+
+    cmp al, 2
+    je lookingForOfficerTwo
+
+    cmp al, 3
+    je lookingForOfficerOne
+
+    lookingForOfficerOne:
+      mov byte[officerToLookFor], 2
+      jmp findPositionOfTheOtherOfficer
+
+    lookingForOfficerTwo:
+      mov byte[officerToLookFor], 3
+      jmp findPositionOfTheOtherOfficer
+
+    findPositionOfTheOtherOfficer:
+      ; INICIALIZA LA POSICIÓN DE BÚSQUEDA
+      mov word[startPosition],  1
+      lookForOfficerInRow:
+        mov word[startPosition + 2], 1
+        lookForOfficerInColumn:
+          mov rdi, qword[board]
+          mov rsi, startPosition
+
+          sub rsp, 8
+          call getBoardItem               ; CONSIGUE EL ELEMENTO DE LA MATRIZ
+          add rsp, 8
+
+          cmp al, byte[officerToLookFor]  ; COMPARA CON EL OFICIAL QUE SE BUSCA
+          je foundOfficer
+
+          inc word[startPosition + 2]
+          cmp word[startPosition + 2], 8
+          jl lookForOfficerInColumn
+
+          inc word[startPosition]
+          cmp word[startPosition], 8
+          jl lookForOfficerInRow
+
+      officerNotFound:
+        mov rax, 0
+        ret
+
+      foundOfficer:
+        mov rax, 1
+        ret
+
 
 
   ; INCREMENTA "nextPosition" SEGÚN EL MOVIMIENTO RECIBIDO
