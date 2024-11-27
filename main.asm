@@ -19,8 +19,6 @@ extern startScreen
 extern statCounterGetPointer
 extern loadGame
 
-extern configureFirstShift
-
 extern quit
 
 section .data
@@ -52,12 +50,6 @@ section .bss
 
 section .text
   main:
-
-      lea rdi, [currentShift]
-      mov sil, 0
-      sub rsp, 8
-      call configureFirstShift
-      add rsp, 8
 
       sub rsp, 8
       call startScreen
