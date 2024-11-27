@@ -9,7 +9,7 @@ extern gets
 ; SUBRUTINAS
 extern getUserPositionInput
 extern printBoard
-extern printCurrentTurn
+extern printCurrentShift
 extern movePiece
 extern checkGameStatus
 extern printQuitMessage
@@ -35,7 +35,7 @@ section .data
   strongholdDir         db       2                  ; 0 = Up, 1 = Right, 2 = Down, 3 = Left
 
   characters            db      'XO ', 0
-  shift                 db       0 ; 0 = Soldiers, 1 = Officers
+  currentShift                 db       0 ; 0 = Soldiers, 1 = Officers
 
   messageLoadGame       db 'Ingrese el nombre del archivo guardado: ', 0
   messageLoadError      db 'Ese archivo no existe. Volviendo al inicio.', 10, 0
@@ -88,7 +88,7 @@ section .text
       
       mov rdx, stronghold
       mov rcx, strongholdDir
-      mov r8, shift
+      mov r8, currentShift
       mov r9, characters
       sub rsp, 8
       call loadGame
@@ -113,7 +113,7 @@ section .text
 
     mainGameLoop:
 
-      ;command cmd_clear
+      command cmd_clear
 
       sub rsp, 8
       call printSaveMessage
@@ -122,9 +122,9 @@ section .text
       call printQuitMessage
       add rsp, 8
 
-      mov rdi, [shift]
+      mov rdi, [currentShift]
       sub rsp, 8
-      call printCurrentTurn
+      call printCurrentShift
       add rsp, 8
 
       mov rdi, board
@@ -143,7 +143,7 @@ section .text
         mov rdi, board
         mov rdx, stronghold
         mov rcx, strongholdDir
-        mov r8, shift
+        mov r8, currentShift
         mov r9, characters
 
         sub     rsp,    8
@@ -154,7 +154,7 @@ section .text
       validateIfMovementIsPossible:
         mov     rdi,    board
         mov     rsi,    qword[positions]
-        mov     rdx,    qword[shift]
+        mov     rdx,    qword[currentShift]
         mov     cl,     byte[strongholdDir]
 
         sub     rsp,    8
@@ -188,17 +188,17 @@ section .text
         jne gameOver
 
         sub rsp, 8
-        call setShift
+        call setCurrentShift
         add rsp, 8
 
         jmp mainGameLoop
   gameOver:
     ret
 
-setShift:
-    mov al, [shift]
+setCurrentShift:
+    mov al, [currentShift]
     xor al, 1
-    mov [shift], al
+    mov [currentShift], al
     ret
 
 ;TEST DE PRINT STATS

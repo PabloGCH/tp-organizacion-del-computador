@@ -1,5 +1,5 @@
 
-global printCurrentTurn
+global printCurrentShift
 %include "macros.asm"
 
 section .data
@@ -11,7 +11,7 @@ section .data
 section .bss
     playerType resb 1
 section .text
-printCurrentTurn:
+printCurrentShift:
     mov byte [playerType], dil
     print newLine
     mov rsi, soldier
