@@ -16,6 +16,7 @@ extern printQuitMessage
 extern printSaveMessage
 extern movementIsPossible
 extern startScreen
+extern optionsScreen
 extern statCounterGetPointer
 extern loadGame
 extern readRotationInput
@@ -26,6 +27,14 @@ extern quit
 section .data
   cmd_clear             db      "clear", 0
 
+  board                 db  -1, -1,  1,  1,  1, -1, -1, \
+                            -1, -1,  1,  1,  1, -1, -1, \
+                             1,  1,  1,  1,  1,  1,  1, \
+                             1,  1,  1,  1,  1,  1,  1, \
+                             1,  1,  0,  0,  0,  1,  1, \
+                            -1, -1,  0,  0,  3, -1, -1, \
+                            -1, -1,  2,  0,  0, -1, -1
+
   stronghold            db  2, 4, 4, 6  ; Array de 4 valores (x1, x2, y1, y2)
   strongholdDir         db  2           ; Donde esta la stronghold (0: Up, 1: Right, 2: Down, 3: Left)
 
@@ -33,6 +42,7 @@ section .data
   currentShift                 db       0 ; 0 = Soldiers, 1 = Officers
 
   messageRotationError  db 'Esa orientacion es invalida. ', 0
+  messageOptionsError   db 'Esa opcion es invalida.', 10, 0
 
   messageLoadGame       db 'Ingrese el nombre del archivo guardado: ', 0
   messageLoadError      db 'Ese archivo no existe. Volviendo al inicio.', 10, 0
@@ -40,8 +50,6 @@ section .data
   modeRead db 'r', 0
 
 section .bss
-  board         resb 49   ; Matriz de 7x7
-
   gameStatus    resb 1
   positions     resq 1
 
@@ -49,14 +57,17 @@ section .bss
 
 section .text
   main:
+      command cmd_clear
 
       sub rsp, 8
       call startScreen
       add rsp, 8
       cmp rax, 1 
-      je mainBoardSelect
+      je mainGameLoop
       cmp rax, 2
       je mainLoadGame
+      cmp rax, 3
+      je mainOptionsMenu
       jmp mainQuit ; Solo da valores entre 1 y 3, asi que por descarte...
 
     mainLoadGame:
@@ -109,8 +120,40 @@ section .text
       add    rsp,    8
       ret
 
-    mainBoardSelect:
-      ; Antes de arrancar un nuevo juego, preguntar por orientacion del tablero
+    mainOptionsMenu:
+      command cmd_clear
+
+    mainOptionsMenuAfterClear:
+      ; Permitir al usuario elegir una opcion de configuracion
+      sub rsp, 8
+      call optionsScreen
+      add rsp, 8
+
+      ; Menu de orientacion
+      cmp rax, 1
+      je optionsMenuRotation
+
+      ; Mostrar mensaje de error si es necesario
+      cmp rax, -1
+      je optionsMenuInvalid
+
+      ; Cancelar y volver al menu principal
+      command cmd_clear
+      jmp main
+
+    optionsMenuInvalid:
+      command cmd_clear
+      mov rdi, messageOptionsError
+      sub rsp, 8
+      call printf
+      add rsp, 8
+      jmp mainOptionsMenuAfterClear
+
+    optionsMenuRotation:
+      ; ===== Orientacion del tablero ===== ;
+      command cmd_clear
+
+      ; Preguntar por orientacion del tablero
       sub rsp, 8
       call readRotationInput
       add rsp, 8
@@ -125,18 +168,19 @@ section .text
 
       ; Verificar si el input era valido
       cmp rax, 0
-      je mainGameLoop
+      je mainOptionsMenu
 
       ; Verificar si es un Back
       cmp rax, 2
-      je main
+      je mainOptionsMenu
 
-      ; Si no fue valido, mostrar mensaje de error
+      ; Si no fue valido, mostrar mensaje de error y reintentar eleccion
       mov rdi, messageRotationError
       sub rsp, 8
       call printf
       add rsp, 8
-      jmp mainBoardSelect
+      jmp optionsMenuRotation
+      ; ============================== ;
 
     mainGameLoop:
 
