@@ -187,7 +187,7 @@ validateNotMovingSideways:
       imul    ax,    7
       
       mov     di,    word[rsi + 2]
-      sub     di,    1
+      sub     di,    2                   ; Se le resta 2 porque queremos la columna anterior, no la actual
       
       add     ax,    di
       
@@ -212,7 +212,7 @@ validateNotMovingSideways:
       imul    ax,    7
       
       mov     di,    word[rsi + 2]
-      sub     di,    1
+      sub     di,    2                   ; Se le resta 2 porque queremos la columna anterior, no la actual
       
       add     ax,    di
       
@@ -238,8 +238,8 @@ validateNotMovingSideways:
       ; SI NO SE ESTA MOVIENDO HACIA LOS COSTADOS SE VERIFICA QUE ARRIBA NO HAYA UN -1
       ; YA QUE DESDE ESA POSICION SOLO SE PUEDE MOVER HACIA LOS COSTADOS
       mov     ax,    word[rsi]
-      sub     ax,    1
-      imul    ax,    7
+      sub     ax,    2
+      imul    ax,    7                    ; Se le resta 2 porque queremos la fila anterior, no la actual
       
       mov     di,    word[rsi + 2]
       sub     di,    1
@@ -264,8 +264,8 @@ validateNotMovingSideways:
 
       ; SI NO ESTA EN LA PRIMERA FILA, SE VALIDA SI HAY UN -1 EN LA CELDA DE ARRIBA, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
       mov     ax,    word[rsi]
-      sub     ax,    1
-      imul    ax,    7
+      sub     ax,    2
+      imul    ax,    7                ; Se le resta 2 porque queremos la fila anterior, no la actual
       
       mov     di,    word[rsi + 2]
       sub     di,    1
@@ -296,8 +296,7 @@ validateNotMovingSideways:
       mov     ax,    word[rsi]
       imul    ax,    7
       
-      mov     di,    word[rsi + 2]
-      sub     di,    1
+      mov     di,    word[rsi + 2]        ; No se le resta 1 porque queremos la columna siguiente, no la actual
       
       add     ax,    di
       
@@ -319,10 +318,9 @@ validateNotMovingSideways:
 
       ; SI NO ESTA EN LA ULTIMA COLUMNA, SE VALIDA SI HAY UN -1 EN LA CELDA DE LA DERECHA, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
       mov     ax,    word[rsi]
-      imul    ax,    7
+      imul    ax,    7              
       
-      mov     di,    word[rsi + 2]
-      sub     di,    1
+      mov     di,    word[rsi + 2]      ; No se le resta 1 porque queremos la columna siguiente, no la actual
   
       add     ax,    di
       
