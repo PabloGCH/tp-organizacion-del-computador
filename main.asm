@@ -18,35 +18,34 @@ extern movementIsPossible
 extern startScreen
 extern statCounterGetPointer
 extern loadGame
+extern readRotationInput
+extern processBoardRotation
 
 extern quit
 
 section .data
   cmd_clear             db      "clear", 0
-  board                 db      -1, -1,  1,  1,  1, -1, -1, \
-                                -1, -1,  1,  1,  1, -1, -1, \
-                                 1,  1,  1,  1,  1,  1,  1, \
-                                 1,  1,  1,  1,  1,  1,  1, \
-                                 1,  1,  0,  0,  0,  1,  1, \
-                                -1, -1,  0,  0,  3, -1, -1, \
-                                -1, -1,  2,  0,  0, -1, -1
 
-  stronghold            db       2,  4,  4,  6
-  strongholdDir         db       2                  ; 0 = Up, 1 = Right, 2 = Down, 3 = Left
+  stronghold            db  2, 4, 4, 6  ; Array de 4 valores (x1, x2, y1, y2)
+  strongholdDir         db  2           ; Donde esta la stronghold (0: Up, 1: Right, 2: Down, 3: Left)
 
   characters            db      'XO ', 0
   currentShift                 db       0 ; 0 = Soldiers, 1 = Officers
 
+  messageRotationError  db 'Esa orientacion es invalida. ', 0
+
   messageLoadGame       db 'Ingrese el nombre del archivo guardado: ', 0
   messageLoadError      db 'Ese archivo no existe. Volviendo al inicio.', 10, 0
 
-    modeRead db 'r', 0
+  modeRead db 'r', 0
 
 section .bss
-  gameStatus resb 1
-  positions  resq 1
+  board         resb 49   ; Matriz de 7x7
 
-  mainLoadPath resb 128
+  gameStatus    resb 1
+  positions     resq 1
+
+  mainLoadPath  resb 128
 
 section .text
   main:
@@ -54,8 +53,8 @@ section .text
       sub rsp, 8
       call startScreen
       add rsp, 8
-      cmp rax, 1
-      je mainGameLoop
+      cmp rax, 1 
+      je mainBoardSelect
       cmp rax, 2
       je mainLoadGame
       jmp mainQuit ; Solo da valores entre 1 y 3, asi que por descarte...
@@ -110,6 +109,34 @@ section .text
       add    rsp,    8
       ret
 
+    mainBoardSelect:
+      ; Antes de arrancar un nuevo juego, preguntar por orientacion del tablero
+      sub rsp, 8
+      call readRotationInput
+      add rsp, 8
+
+      ; Orientar tablero
+      lea rdi, [board]
+      lea rsi, [stronghold]
+      lea rdx, [strongholdDir]
+      sub rsp, 8
+      call processBoardRotation
+      add rsp, 8
+
+      ; Verificar si el input era valido
+      cmp rax, 0
+      je mainGameLoop
+
+      ; Verificar si es un Back
+      cmp rax, 2
+      je main
+
+      ; Si no fue valido, mostrar mensaje de error
+      mov rdi, messageRotationError
+      sub rsp, 8
+      call printf
+      add rsp, 8
+      jmp mainBoardSelect
 
     mainGameLoop:
 
