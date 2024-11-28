@@ -8,7 +8,7 @@ section .data
     mCounter db 3
     stTitle db "Estadísticas de los oficiales:", 10, 0
     mBoxOfficersLine db "+-----------+-----------+-----------+", 10, 0
-    mBoxOfficersTitle db "|           | Oficial 1 | Oficial 2 |", 10, 0
+    mBoxOfficersTitle db "|           | ",27,"[32mOficial 1",27,"[0m | ",27,"[34mOficial 2",27,"[0m |", 10, 0
     mBoxOfficersFormat db "| DIR - %-3d | %-9hhi | %-9hhi |", 10, 0
     mBoxOfficersKillsFormat db "| CAPTURAS  | %-9hhi | %-9hhi |", 10, 0
     newLine db 10, 0
