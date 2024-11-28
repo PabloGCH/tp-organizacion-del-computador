@@ -297,7 +297,7 @@ validateNotMovingSideways:
       imul    ax,    7
       
       mov     di,    word[rsi + 2]
-      add     di,    1
+      sub     di,    1
       
       add     ax,    di
       
@@ -322,7 +322,7 @@ validateNotMovingSideways:
       imul    ax,    7
       
       mov     di,    word[rsi + 2]
-      add     di,    1
+      sub     di,    1
   
       add     ax,    di
       
