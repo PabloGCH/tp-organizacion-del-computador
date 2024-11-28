@@ -318,6 +318,7 @@ validateNotMovingSideways:
 
       ; SI NO ESTA EN LA ULTIMA COLUMNA, SE VALIDA SI HAY UN -1 EN LA CELDA DE LA DERECHA, EN CASO DE QUE SEA ASI PUEDE MOVER HACIA LOS COSTADOS, SINO NO
       mov     ax,    word[rsi]
+      sub     ax,    1
       imul    ax,    7              
       
       mov     di,    word[rsi + 2]      ; No se le resta 1 porque queremos la columna siguiente, no la actual
