@@ -58,3 +58,4 @@ extern  printf
 extern  gets
 extern  sscanf
 
+extern system
