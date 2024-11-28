@@ -21,6 +21,8 @@ extern statCounterGetPointer
 extern loadGame
 extern readRotationInput
 extern processBoardRotation
+extern configureCharacters
+extern configureFirstShift
 
 extern quit
 
@@ -133,6 +135,14 @@ section .text
       cmp rax, 1
       je optionsMenuRotation
 
+      ; Menu de caracteres
+      cmp rax, 2
+      je optionsMenuCharacters
+
+      ; Menu de turno
+      cmp rax, 3
+      je optionsMenuShift
+
       ; Mostrar mensaje de error si es necesario
       cmp rax, -1
       je optionsMenuInvalid
@@ -180,6 +190,24 @@ section .text
       call printf
       add rsp, 8
       jmp optionsMenuRotation
+      ; ============================== ;
+
+    optionsMenuCharacters:
+      ; ===== Caracteres de piezas ===== ;
+      lea rdi, [characters]
+      sub rsp, 8
+      call configureCharacters
+      add rsp, 8
+      jmp mainOptionsMenu
+      ; ============================== ;
+
+    optionsMenuShift:
+      ; ===== Primer turno ===== ;
+      lea rdi, [currentShift]
+      sub rsp, 8
+      call configureFirstShift
+      add rsp, 8
+      jmp mainOptionsMenu
       ; ============================== ;
 
     mainGameLoop:
