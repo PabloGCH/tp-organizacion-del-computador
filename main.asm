@@ -26,6 +26,9 @@ extern quit
 section .data
   cmd_clear             db      "clear", 0
 
+  stronghold            db  2, 4, 4, 6  ; Array de 4 valores (x1, x2, y1, y2)
+  strongholdDir         db  2           ; Donde esta la stronghold (0: Up, 1: Right, 2: Down, 3: Left)
+
   characters            db      'XO ', 0
   shift                 db       0 ; 0 = Soldiers, 1 = Officers
 
@@ -38,9 +41,6 @@ section .data
 
 section .bss
   board         resb 49   ; Matriz de 7x7
-
-  stronghold    resb 4    ; Array de 4 valores (x1, x2, y1, y2)
-  strongholdDir resb 1    ; Donde esta la stronghold (0: Up, 1: Right, 2: Down, 3: Left)
 
   gameStatus    resb 1
   positions     resq 1
