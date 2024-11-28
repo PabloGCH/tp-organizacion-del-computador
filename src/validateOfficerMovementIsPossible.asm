@@ -345,6 +345,7 @@ section .text
       jmp    invalid
 
     valid:
+      ; TODO: AQUI HABRIA QUE INCREMENTAR EL CONTADOR DE MOVIMIENTO DEL OFICIAL QUE SE MOVIO
       mov    rax,    1
       ret
 
