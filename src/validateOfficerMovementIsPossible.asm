@@ -2,6 +2,7 @@ global validateOfficerMovementIsPossible
 extern getBoardItem
 extern returnDirection
 extern removePiece
+extern statCounterAdd
 
 %include "macros.asm"
 
@@ -28,6 +29,8 @@ section .bss
   positions                                 times 4   resb   1    ; Solo se usa para "returnDirection"
 
   officerToLookFor                          resb 1                ; 2 si es el oficial 1, 3 si es el oficial 2
+
+  currentOfficer                            resb 1                ; Para aumentar stat
 
   validatingIdleOfficer                     resb 1                ; 0 si es la primera busqueda (Oficial que se movio), 1 si es la segunda (Oficial que no se movio)
 
@@ -125,6 +128,27 @@ section .text
       je  noPathToDestination
 
       mov  byte[direction],  al
+
+    ; Ya se validó que se pueda hacer movimiento, asi que se incrementa el contador
+    increaseDirection:
+
+      mov rdi, qword[board]
+      mov rsi, startPosition
+      sub rsp, 8
+      call getBoardItem
+      add rsp, 8
+      mov byte[currentOfficer], al
+
+      xor rdi, rdi ; Zero RDI so it only has the single byte
+      mov dil, byte[direction]
+      xor rsi, rsi ; Zero RSI so it only has the single byte
+      mov sil, byte[currentOfficer]
+      sub rsi, 2 ; Stat Counter Add usa 0/1 para oficiales en lugar de 2/3
+      mov dl, 1 ; 1 Movimiento
+      sub rsp, 8
+      call statCounterAdd
+      add rsp, 8
+
       
     checkForSoldiersOnPath:
       ; Se va incrementando la posición hasta llegar a la posición de destino
@@ -322,6 +346,15 @@ section .text
           ; TODO: EN RAX QUEDA EL NUMERO DEL OFICIAl (2 o 3) AQUI HABRIA QUE AGREGAR EL INCREMENTO DEL CONTADOR DE PIEZAS CAPTURADAS
           ;       DE ESE OFICIAL
 
+          mov rsi, rax
+          sub rsi, 2  ; statManager usa 0/1 en vez de 2/3
+          mov rdi, 0  ; Captura -> 0
+          mov dl , 1  ; Cantidad de capturas
+          sub rsp, 8
+          call statCounterAdd
+          add rsp, 8
+
+
           mov  rdi,  qword[board]
           mov  rsi,  previousPosition
 
@@ -345,8 +378,7 @@ section .text
       jmp    invalid
 
     valid:
-      ; TODO: AQUI HABRIA QUE INCREMENTAR EL CONTADOR DE MOVIMIENTO DEL OFICIAL QUE SE MOVIO
-      mov    rax,    1
+      mov rax,    1
       ret
 
     invalid:   
