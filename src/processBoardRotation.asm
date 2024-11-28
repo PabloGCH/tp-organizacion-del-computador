@@ -1,6 +1,6 @@
 section .data
   invalidCharError  db  "Error: Invalid rotation char", 0
-  allowedChars      db  "12345", 0
+  allowedChars      db  "01234", 0
 
   ; Definicion de matrices de rotacion para copia posterior
   matrixUp  db    -1, -1,  0,  0,  2, -1, -1, \
@@ -54,9 +54,9 @@ processBoardRotation:
   push rcx
 
   ; Verificamos que el caracter enviado esta en el rango aceptable
-  cmp al, '1'
+  cmp al, '0'
   jl invalidInput
-  cmp al, '5'
+  cmp al, '4'
   jg invalidInput
 
   ; Validar que el caracter sea uno permitido. Cargamos el nro de caracteres validos en rcx y la direccion de la 'tabla' en rbx
@@ -87,7 +87,7 @@ validInput:
   cmp al, '4'
   je rotationRight
 
-  cmp al, '5'
+  cmp al, '0'
   je cancel
 
 invalidInput:

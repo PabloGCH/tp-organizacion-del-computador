@@ -7,7 +7,7 @@ section .data
                       "[2] - Arriba", 10, \
                       "[3] - Izquierda", 10, \
                       "[4] - Derecha", 10, \
-                      "[5] - Cancelar", 10, \
+                      "[0] - Cancelar", 10, \
                       10, \
                       "Ingrese el numero de la opcion elegida: ", 0
 
