@@ -236,10 +236,12 @@ printCross:
     print cStronghold
 skipCrossRed:
     print bCross
+    print cReset
     ret
 printCrossEmpty:
     print cReset
     print bCrossE
+    print cReset
     ret
 
 printBoxLine:
@@ -262,11 +264,13 @@ printBoxLine:
     print cStronghold
 skipLineRed:
     print bUpDown
+    print cReset
     ret
 
 printLineEmpty:
     print cReset
     print bUpDownE
+    print cReset
     ret
 
 printBoxCrossEnd:
