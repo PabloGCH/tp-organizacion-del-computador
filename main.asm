@@ -20,15 +20,12 @@ extern statCounterGetPointer
 extern statCounterPrint
 extern readRotationInput
 extern processBoardRotation
-<<<<<<< HEAD
 extern printQuitMessage
 extern printSaveMessage
 extern loadGame
 extern startScreen
-=======
 extern configureCharacters
 extern configureFirstShift
->>>>>>> 07e7d50 (Integrar opciones de config de caracteres y turnos al menu de opciones)
 
 extern quit
 
