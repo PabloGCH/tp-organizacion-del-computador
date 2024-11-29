@@ -26,7 +26,7 @@ extern loadGame
 extern startScreen
 extern configureCharacters
 extern configureFirstShift
-
+extern printWinner
 extern quit
 
 section .data
@@ -68,7 +68,7 @@ section .text
       sub rsp, 8
       call startScreen
       add rsp, 8
-      cmp rax, 1 
+      cmp rax, 1
       je mainGameLoop
       cmp rax, 2
       je mainLoadGame
@@ -86,7 +86,7 @@ section .text
       sub rsp, 8
       call gets
       add rsp, 8
-      
+
       mov rdi, mainLoadPath
       mov rsi, modeRead
       sub rsp, 8
@@ -101,7 +101,7 @@ section .text
       call statCounterGetPointer
       add rsp, 8
       mov rsi, rax
-      
+
       mov rdx, stronghold
       mov rcx, strongholdDir
       mov r8, currentShift
@@ -120,10 +120,6 @@ section .text
 
 
     mainQuit:
-
-      sub    rsp,    8
-      call   quit
-      add    rsp,    8
       ret
 
     mainOptionsMenu:
@@ -305,10 +301,16 @@ skipNextShiftMessage:
 
         jmp mainGameLoop
   gameOver:
+    command cmd_clear
+
+    mov dil, [gameStatus]
+    sub rsp, 8
+    call printWinner
+    add rsp, 8
+
     sub rsp, 8
     call statCounterPrint
     add rsp, 8
-    ; TODO: Mensaje de victoria
     ret
 
 setCurrentShift:
@@ -316,4 +318,3 @@ setCurrentShift:
     xor al, 1
     mov [currentShift], al
     ret
-
