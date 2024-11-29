@@ -4,6 +4,8 @@ section .data
   optionPrompt  db  10, \
                       "Elegir aspecto a configurar", 10, \
                       "[1] - Orientacion del tablero", 10, \
+                      "[2] - Caracteres de piezas", 10, \
+                      "[3] - Primer turno", 10, \
                       "[0] - Volver", 10, \
                       10, \
                       "Ingrese el numero de la opcion elegida: ", 0
@@ -27,7 +29,7 @@ optionsScreen:
   ; Valido caracteres
   cmp al, '0'
   jl invalidInput
-  cmp al, '1'
+  cmp al, '3'
   jg invalidInput
 
   ; Guardo la opcion seleccionada en rax
@@ -35,6 +37,10 @@ optionsScreen:
   je backOption
   cmp al, '1'
   je rotationOption
+  cmp al, '2'
+  je characterOption
+  cmp al, '3'
+  je shiftOption
 
 invalidInput:
   mov rax, -1
@@ -46,4 +52,12 @@ backOption:
 
 rotationOption:
   mov rax, 1
+  ret
+
+characterOption:
+  mov rax, 2
+  ret
+
+shiftOption:
+  mov rax, 3
   ret
