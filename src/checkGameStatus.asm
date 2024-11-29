@@ -15,7 +15,7 @@ section .bss
     soldiersInStrongholdCount resb 1
     officersCount resb 1
     drownedOfficers resb 1
-    stronghold resb 1
+    stronghold resb 4
     cRow resb 1
     cCol resb 1
 
