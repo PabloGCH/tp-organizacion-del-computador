@@ -7,19 +7,20 @@ extern printf
 extern fopen
 extern gets
 ; SUBRUTINAS
+extern checkGameStatus
 extern getUserPositionInput
+extern movementIsPossible
+extern movePiece
 extern printBoard
 extern printCurrentShift
-extern movePiece
-extern checkGameStatus
-extern printQuitMessage
-extern printSaveMessage
-extern movementIsPossible
-extern startScreen
 extern statCounterGetPointer
-extern loadGame
+extern statCounterPrint
 extern readRotationInput
 extern processBoardRotation
+extern printQuitMessage
+extern printSaveMessage
+extern loadGame
+extern startScreen
 
 extern quit
 
@@ -220,6 +221,10 @@ section .text
 
         jmp mainGameLoop
   gameOver:
+    sub rsp, 8
+    call statCounterPrint
+    add rsp, 8
+    ; TODO: Mensaje de victoria
     ret
 
 setCurrentShift:
