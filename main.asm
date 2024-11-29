@@ -1,4 +1,6 @@
 global main
+global nextShiftMessage
+
 %include "macros.asm"
 
 ; FUNCIONES EXTERNAS
@@ -37,7 +39,7 @@ section .data
 
   messageLoadGame       db 'Ingrese el nombre del archivo guardado: ', 0
   messageLoadError      db 'Ese archivo no existe. Volviendo al inicio.', 10, 0
-
+  newLine               db 10, 0
   modeRead db 'r', 0
 
 section .bss
@@ -47,6 +49,7 @@ section .bss
   positions     resq 1
 
   mainLoadPath  resb 128
+  nextShiftMessage resq 1
 
 section .text
   main:
@@ -162,6 +165,15 @@ section .text
       call printBoard
       add rsp, 8
 
+      cmp qword [nextShiftMessage], 0
+      je skipNextShiftMessage
+
+      print newLine
+      mov rdx, [nextShiftMessage]
+      print rdx
+      mov qword [nextShiftMessage], 0
+skipNextShiftMessage:
+      print newLine
       receiveInput:
       ; Inputs necesarios para llamar save desde getUserInputPosition
         sub rsp, 8

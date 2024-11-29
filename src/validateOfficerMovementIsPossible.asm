@@ -3,6 +3,7 @@ extern getBoardItem
 extern returnDirection
 extern removePiece
 extern statCounterAdd
+extern nextShiftMessage
 
 %include "macros.asm"
 
@@ -13,8 +14,10 @@ section .data
   obstaclesInTheWayMsg                      db    "Hay obstaculos en el camino", 10, 0
   unexpectedErrorMsg                        db    "Error inesperado", 10, 0
   positionAfterSoldierMustBeDestinationMsg  db    "La casilla despues del soldado debe ser la de destino", 10, 0
-  direction                                 db    0     
-  difference                                dw    0    
+  direction                                 db    0
+  difference                                dw    0
+  officerDiesMessage                        db    27,"[31mEl oficial ha muerto porque no realizó la captura obligatoria.",27,"[0m", 10, 0
+  soldierCapturedMessage                    db    27,"[32mEl soldado ha sido capturado.",27,"[0m", 10, 0
 
 section .bss
   board                                     resq  1
@@ -267,6 +270,10 @@ section .text
           jmp checkForCapture
 
         officerDiesByMissedCapture:
+
+          lea rdx, officerDiesMessage
+          mov qword [nextShiftMessage], rdx
+
           mov rdi, qword[board]
           mov rsi, startPosition
 
@@ -343,6 +350,8 @@ section .text
           call  getBoardItem
           add  rsp,  8
           
+          lea rdx, soldierCapturedMessage
+          mov qword [nextShiftMessage], rdx
           ; TODO: EN RAX QUEDA EL NUMERO DEL OFICIAl (2 o 3) AQUI HABRIA QUE AGREGAR EL INCREMENTO DEL CONTADOR DE PIEZAS CAPTURADAS
           ;       DE ESE OFICIAL
 
