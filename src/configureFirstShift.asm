@@ -75,7 +75,6 @@ menuLoop:
     jmp returnToMainMenu
 printShiftsOptions:
     command cmd_clear
-    print newLine
     print menuText
     ret
 

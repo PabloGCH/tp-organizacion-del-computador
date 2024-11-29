@@ -1,11 +1,10 @@
 %include "macros.asm"
 
 section .data
-  optionPrompt  db  10, \
-                      "Elegir aspecto a configurar", 10, \
+  optionPrompt  db    "Elegir aspecto a configurar", 10, 10, \
                       "[1] - Orientacion del tablero", 10, \
                       "[2] - Caracteres de piezas", 10, \
-                      "[3] - Primer turno", 10, \
+                      "[3] - Primer turno", 10, 10, \
                       "[0] - Volver", 10, \
                       10, \
                       "Ingrese el numero de la opcion elegida: ", 0

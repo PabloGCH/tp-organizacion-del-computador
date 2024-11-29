@@ -10,10 +10,10 @@ section .data
 
     cmd_clear         db      "clear", 0
 
-    startMessageOne   db 27, '[4mEl Asalto', 27, "[0m", 10, 10, 10,0
+    startMessageOne   db 27, '[4mEl Asalto', 27, "[0m", 10, 10, 0
     startMessageTwo   db '[1] - Nueva Partida', 10, 0
     startMessageThree db '[2] - Cargar Partida', 10, 0
-    startMessageFour  db '[3] - Opciones', 10, 0
+    startMessageFour  db '[3] - Configurar Partida', 10, 10, 0
     startMessageFive  db '[0] - Salir', 10, 0
     startMessageInput db 10, 'Ingrese el numero de su opcion deseada: ', 0
     startMessageError db 'Input invalido, por favor ingrese un numero valido', 10, 0

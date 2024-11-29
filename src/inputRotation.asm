@@ -1,14 +1,12 @@
 %include "macros.asm"
 
 section .data
-  rotationPrompt  db  10, \
-                      "Posiciones posibles para la fortaleza", 10, \
+  rotationPrompt  db  "Posiciones posibles para la fortaleza", 10, 10, \
                       "[1] - Abajo", 10, \
                       "[2] - Arriba", 10, \
                       "[3] - Izquierda", 10, \
-                      "[4] - Derecha", 10, \
-                      "[0] - Cancelar", 10, \
-                      10, \
+                      "[4] - Derecha", 10, 10, \
+                      "[0] - Cancelar", 10, 10, \
                       "Ingrese el numero de la opcion elegida: ", 0
 
   rotationFormat  db  "%c", 0
