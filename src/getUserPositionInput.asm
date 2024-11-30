@@ -52,11 +52,6 @@ section .bss
   dataCurrentTurn          resb 1
 
 section .text
-  ;PRE-COND:  LA SUBRUTINA RECIBE
-  ;           EN RDI LA DIRECCIÓN DE MEMORIA DE LA MATRIZ DEL TABLERO
-  ;           EN RSI UN NUMERO QUE INDICA TIPO DE JUGADOR
-  ;           EN RDX LA DIRECCION DE LA FORTALEZA
-
   ; Inputs (RDI -> R9 Punteros)
   ; RDI : Matriz       7  x 7
   ; RSI : Stats        18 x 1

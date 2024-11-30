@@ -1,3 +1,6 @@
+; DIL / SIL: Columna/Fila Inicio
+; DH  / DL : Columna/Fila Destino
+
 section .data
   differenceBetweenRows db 0
   differenceBetweenColumns db 0
@@ -10,9 +13,6 @@ section .text
     global returnDirection
 
     returnDirection:
-        ; (dil;sil) = (x) columnaInicio ; (y) filaInicio
-        ; (dh;dl) = (x) columnaDestino ; (y) filaDestino
-
         mov byte[origin]  , dil 
         mov byte[origin+1], sil
 
