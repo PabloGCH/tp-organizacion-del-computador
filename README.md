@@ -3,7 +3,7 @@
 ### Ejecución
 
 Para iniciar el juego, únicamente debes correr ./run.sh, lo cual compila y ejecuta el juego.
-> El script únicamente funciona en máquinas que utilizan Linux. Para utilizar el juego en Windows/Mac debes compilarlo por tu cuenta.
+> El script únicamente funciona en máquinas que utilizan Linux. Para utilizar el juego en Windows/Mac debes ejecutarlo en WSL.
 
 ### Juego
 
@@ -13,7 +13,7 @@ En el menu inicial puedes elegir empezar una partida desde cero, cargar una part
 > Se puede configurar la dirección de la fortaleza, quien de los dos jugadores comienza la partida, y los caracteres que usan las fichas.
 
 Luego de empezar una partida, podrás guardar el estado del tablero, y tu configuración, en un archivo que luego puedes cargar. Para eso, escribe "Save" en lugar del movimiento que se te pediría que hagas. 
-De la misma forma, puedes escribir "Quit" si en algun momento deseas guardar. Esto NO guarda la partida.
+De la misma forma, puedes escribir "Quit" si en algun momento deseas cerrar el juego. Esto NO guarda la partida.
 
 ### Fichas
 Hay dos tipos de fichas, *Oficiales* y *Soldados*, los cuales corresponden a jugadores distintos.
